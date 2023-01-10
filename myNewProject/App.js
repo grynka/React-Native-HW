@@ -1,36 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as Font from 'expo-font';
-import AppLoading from 'expo-app-loading';
 import { NavigationContainer } from "@react-navigation/native";
 import { useRoute } from './router';
+import * as SplashScreen from 'expo-splash-screen';
 
-const loadApplication = async () => {
-  await Font.loadAsync({
-    'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
-    'Roboto-Medium': require('./assets/fonts/Roboto/Roboto-Medium.ttf')
-  })
-}
-
-
-
-
-
+SplashScreen.preventAutoHideAsync();
+const fonts = {
+          'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
+          'Roboto-Medium': require('./assets/fonts/Roboto/Roboto-Medium.ttf')
+        };
 
 export default function App() {
-  const [IsReady, SetIsReady] = useState(false);
+  const [appIsReady, setAppIsReady] = useState(false);
   const routing = useRoute(true)
  
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await Font.loadAsync(fonts);
+        SplashScreen.hideAsync()
+      } catch (e) {
+        console.warn(e);
+      } finally {
+          setAppIsReady(true);
+          SplashScreen.hideAsync()
+      }
+    }
 
-  if (!IsReady) {
-    return (
-      <AppLoading
-        startAsync={loadApplication}
-        onFinish={() => SetIsReady(true)}
-        onError={console.warn}
-      />
-    );
+    prepare();
+  }, []);
+
+    if (!appIsReady) {
+    return null;
   }
- 
 
   return (
     

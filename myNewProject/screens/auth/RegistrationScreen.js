@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
   delAvatar: {
   borderColor: "#E8E8E8",
   borderWidth: 1,
-
   backgroundColor: "#FFFFFF",
   borderRadius: 50,
   marginRight: -13,

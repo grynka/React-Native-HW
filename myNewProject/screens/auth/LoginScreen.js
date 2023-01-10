@@ -12,8 +12,6 @@ import {
   Text,
   TouchableOpacity,
   Pressable,
-  Dimensions,
-  Button,
 } from "react-native";
 
 export default function LoginScreen({ navigation }) {

@@ -18,7 +18,7 @@ const loadApplication = async () => {
 
 export default function App() {
   const [IsReady, SetIsReady] = useState(false);
-  const routing = useRoute(null)
+  const routing = useRoute(true)
  
 
   if (!IsReady) {

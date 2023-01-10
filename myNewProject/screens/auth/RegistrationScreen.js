@@ -12,25 +12,44 @@ import {
   Text,
   TouchableOpacity,
   Pressable,
-  Button,
-
+  Image,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 export default function RegistrationScreen({ navigation }) {
+  const [avatar, setAvatar] = useState("");
   const [login, setLogin] = useState("");
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
   const [isSecurity, setIsSecurity] = useState(true);
-  const [isShowKeybord, setIsShowKeybord] = useState(false)
+  const [isShowKeybord, setIsShowKeybord] = useState(false);
+
   const keboardHide = () => {
     setIsShowKeybord(false);
     Keyboard.dismiss();
-  }
+  };
   const loginHandler = (text) => setLogin(text);
   const mailHandler = (text) => setMail(text);
   const passwordHandler = (text) => setPassword(text);
   const onLogin = () => {
     Alert.alert("Credentials", `${login} +${mail} + ${password}`);
+  };
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setAvatar(result.assets[0].uri);
+    }
   };
 
   return (
@@ -40,8 +59,24 @@ export default function RegistrationScreen({ navigation }) {
           style={styles.image}
           source={require("../../assets/images/BG.jpg")}
         >
-          <KeyboardAvoidingView  behavior={Platform.OS == "ios" ? "padding" : "height"}>
-            <View style={{...styles.form, paddingBottom: isShowKeybord ? 10 : 78}}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS == "ios" ? "padding" : "height"}
+          >
+            <View
+              style={{ ...styles.form, paddingBottom: isShowKeybord ? 10 : 78 }}
+            >
+              <View style={styles.inputAvatar}>
+                {avatar && (
+                  <Image source={{ uri: avatar }} style={styles.avatar} />
+                )}
+                
+                 {avatar ? <Pressable style={styles.delAvatar} onPress={() => setAvatar(null)}><Text style={styles.addAvatarUnion}>
+                 <AntDesign name="close" size={24} color="#BDBDBD" />
+                  </Text></Pressable> : <Pressable style={styles.addAvatar} onPress={pickImage}><Text style={styles.addAvatarUnion}>
+                    <AntDesign name="plus" size={20} color="#FF6C00" />
+                  </Text></Pressable>}
+                
+              </View>
               <Text style={styles.title}>Регистрация</Text>
               <TextInput
                 value={login}
@@ -71,24 +106,26 @@ export default function RegistrationScreen({ navigation }) {
                     setIsSecurity((prev) => !prev);
                   }}
                 >
-                  <Text style={styles.showPass}>{isSecurity ? "Показать" : "Скрыть"}</Text>
+                  <Text style={styles.showPass}>
+                    {isSecurity ? "Показать" : "Скрыть"}
+                  </Text>
                 </Pressable>
               </View>
-              <View style={{display: isShowKeybord ? 'none' : 'flex'}}>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.loginButton}
-                onPress={onLogin}
-              >
-                <Text style={styles.loginButtonText}>Зарегистрироваться</Text>
-              </TouchableOpacity>
-              <View style={styles.container1}>
-              <Text style={styles.noRegister}>
-                Уже есть аккаунт?                 
-                
-              </Text><Pressable         
-                onPress={() => navigation.navigate("Login")}
-      ><Text style={styles.noRegisterBtn}>Войти</Text></Pressable></View></View>
+              <View style={{ display: isShowKeybord ? "none" : "flex" }}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.loginButton}
+                  onPress={onLogin}
+                >
+                  <Text style={styles.loginButtonText}>Зарегистрироваться</Text>
+                </TouchableOpacity>
+                <View style={styles.containerNoRegister}>
+                  <Text style={styles.noRegister}>Уже есть аккаунт?</Text>
+                  <Pressable onPress={() => navigation.navigate("Login")}>
+                    <Text style={styles.noRegisterBtn}> Войти</Text>
+                  </Pressable>
+                </View>
+              </View>
             </View>
           </KeyboardAvoidingView>
         </ImageBackground>
@@ -103,6 +140,43 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 
+  addAvatar: {
+    color: "#FF6C00",
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#FF6C00",
+    width: 25,
+    height: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: -13,
+    backgroundColor: "#FFFFFF",
+  },
+
+  delAvatar: {
+  borderColor: "#E8E8E8",
+  borderWidth: 1,
+
+  backgroundColor: "#FFFFFF",
+  borderRadius: 50,
+  marginRight: -13,
+  width: 25,
+  height: 25,
+  justifyContent: "center",
+  alignItems: "center",
+  },
+
+  addAvatarUnion: {
+    color: "#FF6C00",
+    fontSize: 13,
+    padding: 0,
+    margin: 0,
+  },
+
+  containerNoRegister: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
 
   inputContainer: {
     backgroundColor: "#F6F6F6",
@@ -112,6 +186,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#E8E8E8",
+  },
+
+  avatar: {
+    borderRadius: 8,
+    width: 120,
+    height: 120,
+    marginRight: 0,
+    marginBottom: -39,
   },
 
   image: {
@@ -127,6 +209,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     fontFamily: "Roboto-Regular",
     paddingBottom: 144,
+    justifyContent: "center",
   },
 
   input: {
@@ -141,9 +224,25 @@ const styles = StyleSheet.create({
   },
 
   showPass: {
-    color: '#1B4371',
+    color: "#1B4371",
     fontSize: 16,
     fontFamily: "Roboto-Regular",
+  },
+
+  inputAvatar: {
+    height: 120,
+    marginBottom: 32,
+    borderColor: "#E8E8E8",
+    borderRadius: 8,
+    backgroundColor: "#F6F6F6",
+    color: "#212121",
+    fontSize: 16,
+    width: 120,
+    alignSelf: "center",
+    marginTop: -92,
+    justifyContent: "flex-end",
+    paddingBottom: 14,
+    alignItems: "flex-end",
   },
 
   inputName: {

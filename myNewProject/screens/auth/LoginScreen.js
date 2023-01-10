@@ -73,12 +73,13 @@ export default function LoginScreen({ navigation }) {
               >
                 <Text style={styles.loginButtonText}>Войти</Text>
               </TouchableOpacity>
+              <View style={styles.containerNoRegister}>
               <Text style={styles.noRegister}>
-                Нет акаунта? 
+                Нет акаунта? </Text>
                 <Pressable 
         onPress={() => navigation.navigate("Registration")}
-      ><Text style={styles.noRegister}>Зарегистрироваться</Text></Pressable>
-              </Text></View>
+      ><Text style={styles.noRegister}> Зарегистрироваться</Text></Pressable>
+              </View></View>
             </View>
           </KeyboardAvoidingView>
         </ImageBackground>
@@ -178,5 +179,9 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     color: "#1B4371",
     fontSize: 16,
+  },
+  containerNoRegister: {
+    flexDirection: "row",
+    justifyContent: "center",
   },
 });

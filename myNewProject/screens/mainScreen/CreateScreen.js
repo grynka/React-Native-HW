@@ -60,15 +60,12 @@ const nameHandler = (text) => setName(text);
     if (!result.canceled) {
       setLocation({ latitude: loc.coords.latitude, longitude: loc.coords.longitude})
       setImage(result.assets[0].uri);
-      getGeocodeAsync()
     }   
+    getGeocodeAsync()
   };
 
   return (
-    
-
     <View style={styles.container}>
-
     <View style={styles.head}>
       <View style={styles.addfoto}>
         {image && <Image source={{ uri: image }} style={styles.foto} />}
@@ -93,9 +90,9 @@ const nameHandler = (text) => setName(text);
       <TextInput placeholder="Название..." style={styles.name} value={name}
                   onChangeText={nameHandler}/>
       <View style={styles.locationSection}>
-        <EvilIcons name="location" style={styles.locationIcon} size={24} />
-        <TextInput placeholder="Местность..." style={styles.location} value={location.latitude} onChangeText={() => getLocation}/>
-      </View>{geocode && <Text>{geocode.region}, {geocode.country}</Text>}
+        <EvilIcons name="location" style={styles.locationIcon} size={24} onPress={getGeocodeAsync} />
+        <TextInput placeholder="Местность..." style={styles.location} value={geocode ? `${geocode.region}, ${geocode.country}`  : ''} onChangeText={getGeocodeAsync}/>
+      </View>
       <TouchableOpacity
         activeOpacity={0.8}
         style={{
@@ -117,7 +114,7 @@ const nameHandler = (text) => setName(text);
       </View>
 
       <View style={styles.bottom}>
-      <TouchableOpacity onPress={() => setImage(null)} style={styles.delete}>
+      <TouchableOpacity onPress={() => {setImage(null), setGeocode(null)}} style={styles.delete}>
         <Feather name="trash-2" size={24} color="#BDBDBD" />
       </TouchableOpacity>
       </View>

@@ -16,6 +16,7 @@ export default function CreateScreen() {
   const [image, setImage] = useState(null);
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
+  const [geocode, setGeocode] = useState();
 
 
  const startUserLocationUpdates = async () => { 
@@ -32,8 +33,15 @@ if (Platform.OS !== "web") {
   }
 }
   }
-
- 
+const  getGeocodeAsync= async () => {
+    let geocode = await Location.reverseGeocodeAsync(location)
+    setGeocode({geocode})
+    setGeocode(({geocode}) => geocode[0])
+    //console.log(geocode[0].region, geocode[0].country)
+    console.log(geocode)
+    console.log(location)
+  }
+  
 
 const nameHandler = (text) => setName(text);
 
@@ -52,12 +60,16 @@ const nameHandler = (text) => setName(text);
     if (!result.canceled) {
       setLocation({ latitude: loc.coords.latitude, longitude: loc.coords.longitude})
       setImage(result.assets[0].uri);
-    }
-    console.log(location)
+      getGeocodeAsync()
+    }   
   };
 
   return (
+    
+
     <View style={styles.container}>
+
+    <View style={styles.head}>
       <View style={styles.addfoto}>
         {image && <Image source={{ uri: image }} style={styles.foto} />}
         <TouchableOpacity
@@ -82,15 +94,15 @@ const nameHandler = (text) => setName(text);
                   onChangeText={nameHandler}/>
       <View style={styles.locationSection}>
         <EvilIcons name="location" style={styles.locationIcon} size={24} />
-        <TextInput placeholder="Местность..." style={styles.location} value={location} />
-      </View><Text>{location && location.coords}</Text>
+        <TextInput placeholder="Местность..." style={styles.location} value={location.latitude} onChangeText={() => getLocation}/>
+      </View>{geocode && <Text>{geocode.region}, {geocode.country}</Text>}
       <TouchableOpacity
         activeOpacity={0.8}
         style={{
           ...styles.createButton,
           backgroundColor: image ? "#FF6C00" : "#F6F6F6",
         }}
-        onPress={{}}
+        onPress={getGeocodeAsync}
       >
         <Text
           style={{
@@ -102,9 +114,14 @@ const nameHandler = (text) => setName(text);
           Опубликовать
         </Text>
       </TouchableOpacity>
+      </View>
+
+      <View style={styles.bottom}>
       <TouchableOpacity onPress={() => setImage(null)} style={styles.delete}>
         <Feather name="trash-2" size={24} color="#BDBDBD" />
       </TouchableOpacity>
+      </View>
+
     </View>
   );
 }
@@ -116,14 +133,22 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
 
+  head: {
+    width: "100%",
+  },
+
   container: {
     flex: 1,
+    width: "100%",
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 32,
     paddingLeft: 16,
     paddingRight: 16,
+    paddingBottom: 32,
     backgroundColor: "#FFFFFF",
+    borderTopWidth: 1,
+    borderColor: "#212121"
   },
 
   addfoto: {
@@ -206,7 +231,6 @@ width: "100%",
     fontSize: 16,
     fontFamily: "Roboto-Regular",
     paddingVertical: 16,
-    marginHorizontal: 16,
     borderRadius: 50,
     alignItems: "center",
   },

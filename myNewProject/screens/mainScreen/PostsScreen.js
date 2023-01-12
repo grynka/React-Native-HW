@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, AntDesign, StyleSheet, Image } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
+
 
 const PostsScreen = () => {
     const [avatar, setAvatar] = useState(
@@ -7,7 +10,6 @@ const PostsScreen = () => {
     );
     const [name, setName] = useState("Natali Romanova");
     const [mail, setMail] = useState("mail@example.com");
-
     return (
         <View style={styles.profile}>
         {avatar && (
@@ -18,6 +20,7 @@ const PostsScreen = () => {
         <Text style={styles.mail}>{mail}</Text>
         </View>
       </View>
+      
     )
 }
 

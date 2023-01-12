@@ -90,8 +90,10 @@ const nameHandler = (text) => setName(text);
       <TextInput placeholder="Название..." style={styles.name} value={name}
                   onChangeText={nameHandler}/>
       <View style={styles.locationSection}>
-        <EvilIcons name="location" style={styles.locationIcon} size={24} onPress={getGeocodeAsync} />
-        <TextInput placeholder="Местность..." style={styles.location} value={geocode ? `${geocode.region}, ${geocode.country}`  : ''} onChangeText={getGeocodeAsync}/>
+      <TouchableOpacity onPress={getGeocodeAsync}>
+        <EvilIcons name="location" style={styles.locationIcon} size={24}  /></TouchableOpacity>
+        <TextInput placeholder="Местность..." style={styles.location} value={geocode ? `${geocode.region}, ${geocode.country}`  : ''} />
+        
       </View>
       <TouchableOpacity
         activeOpacity={0.8}

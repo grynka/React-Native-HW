@@ -40,6 +40,7 @@ const  getGeocodeAsync= async () => {
     //console.log(geocode[0].region, geocode[0].country)
     console.log(geocode)
     console.log(location)
+    return geocode
   }
   
 

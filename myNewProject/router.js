@@ -49,13 +49,14 @@ export const useRoute = (isAuth) => {
     >
       <MainTab.Screen
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, size, color }) => (
             <SimpleLineIcons name="grid" size={24} color={color} />
           ),
         }}
-        name="Публикации"
+        name="PostsScreen"
         component={PostsScreen}
-        headerTitle
+        
       />
       <MainTab.Screen
         options={{

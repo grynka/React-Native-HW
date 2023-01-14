@@ -36,7 +36,6 @@ export default function CreateScreen({ navigation }) {
     let geocode = await Location.reverseGeocodeAsync(location);
     setGeocode({ geocode });
     setGeocode(({ geocode }) => geocode[0]);
-    //console.log(geocode[0].region, geocode[0].country)
     console.log(geocode);
     console.log(location);
   };
@@ -64,7 +63,7 @@ export default function CreateScreen({ navigation }) {
 
  const sendFoto = () => {
   console.log(navigation)
-  navigation.navigate('DefaultPostsScreen', {image, geocode, name});
+  navigation.navigate('Публикации', {image, geocode, name, location});
  };
 
   return (

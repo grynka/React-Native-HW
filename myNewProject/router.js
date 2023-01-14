@@ -55,6 +55,7 @@ export const useRoute = (isAuth) => {
         }}
         name="Публикации"
         component={PostsScreen}
+        headerTitle
       />
       <MainTab.Screen
         options={{

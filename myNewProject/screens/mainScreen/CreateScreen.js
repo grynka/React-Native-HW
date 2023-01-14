@@ -39,7 +39,6 @@ export default function CreateScreen({ navigation }) {
     //console.log(geocode[0].region, geocode[0].country)
     console.log(geocode);
     console.log(location);
-    return geocode;
   };
 
   const nameHandler = (text) => setName(text);
@@ -54,8 +53,6 @@ export default function CreateScreen({ navigation }) {
     });
     const loc = await Location.getCurrentPositionAsync();
 
-    console.log(result);
-
     if (!result.canceled) {
       setLocation({
         latitude: loc.coords.latitude,
@@ -63,12 +60,11 @@ export default function CreateScreen({ navigation }) {
       });
       setImage(result.assets[0].uri);
     }
-    getGeocodeAsync();
   };
 
  const sendFoto = () => {
   console.log(navigation)
-  navigation.navigate("PostsScreen", {Image});
+  navigation.navigate('Публикации', {image, geocode, name});
  };
 
   return (

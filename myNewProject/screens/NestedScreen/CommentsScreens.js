@@ -1,6 +1,6 @@
 import React from "react"
 
-const CommentsScreen = () => {
+const CommentsScreen = ({navigation}) => {
 
 }
 

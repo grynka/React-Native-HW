@@ -5,16 +5,16 @@ import CommentsScreen from "../NestedScreen/CommentsScreens";
 
 
 
-const NestedScreens = createStackNavigator();
+const NestedScreens = createStackNavigator({ });
 
 const PostsScreen = () => {
  
   return (
       <NestedScreens.Navigator>
         <NestedScreens.Screen
-          name="Публикации"
+          name="DefaultPostsScreen"
           component={DefaultPostsScreen}
-        />
+                  />
         <NestedScreens.Screen name="Коментарии" component={CommentsScreen} />
       </NestedScreens.Navigator>
   );

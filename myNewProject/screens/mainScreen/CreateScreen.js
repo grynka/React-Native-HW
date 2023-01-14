@@ -64,7 +64,7 @@ export default function CreateScreen({ navigation }) {
 
  const sendFoto = () => {
   console.log(navigation)
-  navigation.navigate('Публикации', {image, geocode, name});
+  navigation.navigate('DefaultPostsScreen', {image, geocode, name});
  };
 
   return (

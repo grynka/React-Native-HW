@@ -17,13 +17,13 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch } from "react-redux";
-import { authSignUpUser } from "../../redux/auth/authOperation";
+import { createUser } from "../../redux/auth/authOperation";
 
 const initialState = {
   email: "",
   password: "",
   username: "",
-}
+};
 
 export default function RegistrationScreen({ navigation }) {
   const [avatar, setAvatar] = useState("");
@@ -32,7 +32,7 @@ export default function RegistrationScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [isSecurity, setIsSecurity] = useState(true);
   const [isShowKeybord, setIsShowKeybord] = useState(false);
-  const [state, setState] = useState(initialState)
+  const [state, setState] = useState(initialState);
   const dispatch = useDispatch();
 
   const keboardHide = () => {
@@ -42,11 +42,11 @@ export default function RegistrationScreen({ navigation }) {
   const loginHandler = (text) => setUsername(text);
   const mailHandler = (text) => setEmail(text);
   const passwordHandler = (text) => setPassword(text);
-  const hundleSubmit = () => {
-    keboardHide();
-    dispatch(authSignUpUser(state))
-    setState(initialState)
-    console.log("Credentials", `${username} +${email} + ${password}`);
+
+  const handleSubmit = () => {
+    setIsShowKeybord(false);
+    Keyboard.dismiss();
+    dispatch(createUser(email, password));
   };
 
   const pickImage = async () => {
@@ -82,13 +82,23 @@ export default function RegistrationScreen({ navigation }) {
                 {avatar && (
                   <Image source={{ uri: avatar }} style={styles.avatar} />
                 )}
-                
-                 {avatar ? <Pressable style={styles.delAvatar} onPress={() => setAvatar(null)}><Text style={styles.addAvatarUnion}>
-                 <AntDesign name="close" size={24} color="#BDBDBD" />
-                  </Text></Pressable> : <Pressable style={styles.addAvatar} onPress={pickImage}><Text style={styles.addAvatarUnion}>
-                    <AntDesign name="plus" size={20} color="#FF6C00" />
-                  </Text></Pressable>}
-                
+
+                {avatar ? (
+                  <Pressable
+                    style={styles.delAvatar}
+                    onPress={() => setAvatar(null)}
+                  >
+                    <Text style={styles.addAvatarUnion}>
+                      <AntDesign name="close" size={24} color="#BDBDBD" />
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <Pressable style={styles.addAvatar} onPress={pickImage}>
+                    <Text style={styles.addAvatarUnion}>
+                      <AntDesign name="plus" size={20} color="#FF6C00" />
+                    </Text>
+                  </Pressable>
+                )}
               </View>
               <Text style={styles.title}>Регистрация</Text>
               <TextInput
@@ -128,7 +138,7 @@ export default function RegistrationScreen({ navigation }) {
                 <TouchableOpacity
                   activeOpacity={0.8}
                   style={styles.loginButton}
-                  onPress={hundleSubmit}
+                  onPress={handleSubmit}
                 >
                   <Text style={styles.loginButtonText}>Зарегистрироваться</Text>
                 </TouchableOpacity>
@@ -167,15 +177,15 @@ const styles = StyleSheet.create({
   },
 
   delAvatar: {
-  borderColor: "#E8E8E8",
-  borderWidth: 1,
-  backgroundColor: "#FFFFFF",
-  borderRadius: 50,
-  marginRight: -13,
-  width: 25,
-  height: 25,
-  justifyContent: "center",
-  alignItems: "center",
+    borderColor: "#E8E8E8",
+    borderWidth: 1,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 50,
+    marginRight: -13,
+    width: 25,
+    height: 25,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   addAvatarUnion: {

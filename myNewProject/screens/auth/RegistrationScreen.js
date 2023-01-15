@@ -16,24 +16,37 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { useDispatch } from "react-redux";
+import { authSignUpUser } from "../../redux/auth/authOperation";
+
+const initialState = {
+  email: "",
+  password: "",
+  username: "",
+}
 
 export default function RegistrationScreen({ navigation }) {
   const [avatar, setAvatar] = useState("");
-  const [login, setLogin] = useState("");
-  const [mail, setMail] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSecurity, setIsSecurity] = useState(true);
   const [isShowKeybord, setIsShowKeybord] = useState(false);
+  const [state, setState] = useState(initialState)
+  const dispatch = useDispatch();
 
   const keboardHide = () => {
     setIsShowKeybord(false);
     Keyboard.dismiss();
   };
-  const loginHandler = (text) => setLogin(text);
-  const mailHandler = (text) => setMail(text);
+  const loginHandler = (text) => setUsername(text);
+  const mailHandler = (text) => setEmail(text);
   const passwordHandler = (text) => setPassword(text);
-  const onLogin = () => {
-    Alert.alert("Credentials", `${login} +${mail} + ${password}`);
+  const hundleSubmit = () => {
+    keboardHide();
+    dispatch(authSignUpUser(state))
+    setState(initialState)
+    console.log("Credentials", `${username} +${email} + ${password}`);
   };
 
   const pickImage = async () => {
@@ -79,14 +92,14 @@ export default function RegistrationScreen({ navigation }) {
               </View>
               <Text style={styles.title}>Регистрация</Text>
               <TextInput
-                value={login}
+                value={username}
                 onChangeText={loginHandler}
                 placeholder="Логин"
                 style={styles.inputName}
                 onFocus={() => setIsShowKeybord(true)}
               />
               <TextInput
-                value={mail}
+                value={email}
                 onChangeText={mailHandler}
                 placeholder="Адрес электронной почты"
                 style={styles.inputName}
@@ -115,7 +128,7 @@ export default function RegistrationScreen({ navigation }) {
                 <TouchableOpacity
                   activeOpacity={0.8}
                   style={styles.loginButton}
-                  onPress={onLogin}
+                  onPress={hundleSubmit}
                 >
                   <Text style={styles.loginButtonText}>Зарегистрироваться</Text>
                 </TouchableOpacity>

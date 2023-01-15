@@ -29,7 +29,20 @@ const COMENTARS = [
 ];
 
 const CommentsScreen = () => {
+  const [coment, setComent] = useState('');
   const [comentars, setComentars] = useState(COMENTARS);
+
+const comentHandler = (text) => setComent(text);
+const addComent = () => {
+  setComentars((prevState) => [
+    ...prevState,
+    {
+     text: coment,
+     author: "vika",
+     avatar: require("../../assets/images/avatar.jpg"),
+    },]);
+    setComent('')
+};
 
   return (
     <View style={{flex: 1, backgroundColor: "#FFFFFF", paddingHorizontal: 16 }}>
@@ -41,14 +54,15 @@ const CommentsScreen = () => {
         ))}
       </ScrollView>
       <View style={styles.input}>
-        <TextInput placeholder="Комменттировать" style={styles.field} />
-        <TouchableOpacity style={styles.btn}>
+        <TextInput onChangeText={comentHandler} placeholder="Комментировать" style={styles.field} value={coment}/>
+        <TouchableOpacity style={styles.btn} onPress={addComent}>
           <AntDesign name="arrowup" size={20} color="white" />
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   avatar: {
     height: 28,

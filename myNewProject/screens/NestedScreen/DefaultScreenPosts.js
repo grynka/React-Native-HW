@@ -22,17 +22,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
         },
       ]);
     }
-    console.log(route);
   }, [route.params]);
-
-  useEffect(() => {
-    console.log(posts);
-  }, [posts]);
-
-  const getMap = ({location}) => {
-    console.log(location)
-    navigation.navigate('Карта', {location});
-   };
 
   return (
     <View style={styles.posts}>
@@ -82,7 +72,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
                 marginBottom: 8,
               }}
             >
-              <Pressable onPress={() => navigation.navigate("Коментарии")}>
+              <Pressable onPress={() => navigation.navigate("Коментарии", {item})}>
                 <Text
                   style={{
                     color: "#BDBDBD",

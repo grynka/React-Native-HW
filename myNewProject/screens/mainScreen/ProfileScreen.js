@@ -1,61 +1,119 @@
-import React, {useEffect, useState} from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import MapView, { Marker } from "react-native-maps";
-import * as Location from "expo-location";
+import React, { useState } from "react";
+import { AntDesign} from "@expo/vector-icons";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 
-const ProfileScreen = () => {
-    const [location, setLocation] = useState(null);
+const COMENTARS = [
+  {
+    author: "aurora",
+    avatar: require("../../assets/images/avatar.jpg"),
+    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
+  },
+  {
+    author: "vika",
+    avatar: require("../../assets/images/avatar.jpg"),
+    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
+  },
+  {
+    author: "lilia",
+    avatar: require("../../assets/images/avatar.jpg"),
+    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
+  },
+];
 
-    useEffect(() => {
-        (async () => {
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status !== "granted") {
-            console.log("Permission to access location was denied");
-          }
-    
-          let location = await Location.getCurrentPositionAsync({});
-          const coords = {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          };
-          setLocation(coords);
-        })();
-      }, []);
-    
+const CommentsScreen = () => {
+  const [comentars, setComentars] = useState(COMENTARS);
 
+  return (
+    <View style={{flex: 1, backgroundColor: "#FFFFFF", paddingHorizontal: 16 }}>
+      <ScrollView>
+        {comentars.map((comentar) => (
+          <View key={comentar.index} style={comentar.index % 2 === 0 ? styles.comentar : styles.comentar2}>
+          <Image source={comentar.avatar}   style={styles.avatar}/>
+          <Text  style={styles.text}>{comentar.text}</Text></View>
+        ))}
+      </ScrollView>
+      <View style={styles.input}>
+        <TextInput placeholder="Комменттировать" style={styles.field} />
+        <TouchableOpacity style={styles.btn}>
+          <AntDesign name="arrowup" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+const styles = StyleSheet.create({
+  avatar: {
+    height: 28,
+    width: 28,
+    borderRadius: 50,
+    marginRight: 16,
+  },
 
-    return (
-        <View style={styles.container}>
-          <MapView
-            style={styles.mapStyle}
-            region={{
-              ...location,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-            showsUserLocation={true}
-          >
-            {location && (
-              <Marker title="I am here" coordinate={location} description="Hello" />
-            )}
-          </MapView>
-          {location && <Text style={styles.container}> {location.latitude}</Text>}
-        </View>
-      );
-    };
-    
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
-      },
-      mapStyle: {
-        width: Dimensions.get("window").width,
-        height: Dimensions.get("window").height,
-      },
-    });
-    
+  comentar: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+    justifyContent: 'flex-start',
+  },
 
-export default ProfileScreen
+  comentar2: {
+    flexDirection: 'row-reverse',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+    justifyContent: 'flex-end',
+  },
+
+  text: {
+backgroundColor: 'rgba(0, 0, 0, 0.03)',
+paddingHorizontal: 16,
+paddingTop: 16,
+paddingBottom: 8,
+borderTopRightRadius: 6,
+borderBottomLeftRadius: 6,
+borderBottomRightRadius: 6,
+flex: 1,
+
+  },
+
+  btn: {
+    width: 34,
+    height: 34,
+    fontFamily: "Roboto-Regular",
+    borderRadius: 50,
+    backgroundColor: "#FF6C00",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  field: {
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  input: {
+    paddingRight: 8,
+    paddingLeft: 16,
+    height: 50,
+    borderColor: "#E8E8E8",
+    borderWidth: 1,
+    backgroundColor: "#F6F6F6",
+    color: "#BDBDBD",
+    borderRadius: 50,
+    flexDirection: "row",
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+});
+
+export default CommentsScreen;

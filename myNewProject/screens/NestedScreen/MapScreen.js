@@ -4,20 +4,27 @@ import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
 const MapScreen = ({route}) => {
-    console.log(route.params.item.location)
+    const [location, setLocation] = useState(null);
+    
+    useEffect(() => {
+        console.log(route.params.item.location)
+        if (route.params) {
+          setLocation(route.params.item.location)
+        }}, [route.params])
+
     return (
         <View style={styles.container}>
           <MapView
             style={styles.mapStyle}
             region={{
-              ...route.params.item.location,
+              ...location,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
             showsUserLocation={true}
           >
             {location && (
-              <Marker title="Foto create her" coordinate={location} description="Hello" />
+              <Marker title="Foto create her" coordinate={location} />
             )}
           </MapView>
           {location && <Text style={styles.container}> {location.latitude}</Text>}

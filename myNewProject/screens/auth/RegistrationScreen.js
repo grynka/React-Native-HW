@@ -17,7 +17,7 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch } from "react-redux";
-import { createUser } from "../../redux/auth/authOperation";
+import { authSignUpUser } from "../../redux/auth/authOperation";
 
 const initialState = {
   email: "",
@@ -46,7 +46,8 @@ export default function RegistrationScreen({ navigation }) {
   const handleSubmit = () => {
     setIsShowKeybord(false);
     Keyboard.dismiss();
-    dispatch(createUser(email, password));
+    console.log(email, password, username, avatar)
+    dispatch(authSignUpUser(email, password, username, avatar));
   };
 
   const pickImage = async () => {

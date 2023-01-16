@@ -1,24 +1,39 @@
 import { collection, addDoc } from "firebase/firestore"; 
-import db from "../../firebase/config";
-
-export const authSignInUser = () => async (dispatch, getState) => {
-try {
+import {firebase} from "../../firebase/config";
+import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword } from "firebase/auth";
 
 
-}    
-catch (error) {
-    console.log(error.message)
-}
+export const authSignInUser = (email, password) => async () => {
+  const auth = getAuth();
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      console.log(email, password)
+
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+    });
 };
 
-export const createUser = () => async (email, password) => {
-    try {
-        const user = await db.auth().createUserWithEmailAndPassword(email, password);
-        console.log(user)
-    }  
-    catch (error) {
-        console.log(error.message)
-    }
+export const authSignUpUser = (email, password, username, avatar) => async () => {
+  const auth = getAuth();
+  await  createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      // ...
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // ..
+    });
+     console.log(email, password, username, avatar),
+     await  updateProfile(auth.currentUser, {
+        displayName: username, photoURL: avatar})
      };
 
 export const writeDataToFirestore = async () => {

@@ -7,15 +7,18 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   ImageBackground,
   Text,
   TouchableOpacity,
   Pressable,
 } from "react-native";
+import { authSignInUser } from "../../redux/auth/authOperation";
+import { useDispatch } from "react-redux";
+
+
 
 export default function LoginScreen({ navigation }) {
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSecurity, setIsSecurity] = useState(true);
   const [isShowKeybord, setIsShowKeybord] = useState(false)
@@ -23,10 +26,15 @@ export default function LoginScreen({ navigation }) {
     setIsShowKeybord(false);
     Keyboard.dismiss();
   }
-  const nameHandler = (text) => setName(text);
+  const dispatch = useDispatch();
+
+  const emailHandler = (text) => setEmail(text);
   const passwordHandler = (text) => setPassword(text);
-  const onLogin = () => {
-    Alert.alert("Credentials", `${name} + ${password}`);
+
+  const handleSubmit = () => {
+    setIsShowKeybord(false);
+    Keyboard.dismiss();
+    dispatch(authSignInUser(email, password));
   };
 
   return (
@@ -40,8 +48,8 @@ export default function LoginScreen({ navigation }) {
             <View style={{...styles.form, paddingBottom: isShowKeybord ? 10 : 144}}>
               <Text style={styles.title}>Войти</Text>
               <TextInput
-                value={name}
-                onChangeText={nameHandler}
+                value={email}
+                onChangeText={emailHandler}
                 placeholder="Адрес электронной почты"
                 style={styles.inputName}
                 onFocus={() => setIsShowKeybord(true)}
@@ -67,7 +75,7 @@ export default function LoginScreen({ navigation }) {
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.loginButton}
-                onPress={onLogin}
+                onPress={handleSubmit}
               >
                 <Text style={styles.loginButtonText}>Войти</Text>
               </TouchableOpacity>

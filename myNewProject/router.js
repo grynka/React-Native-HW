@@ -42,9 +42,14 @@ export const useRoute = (isAuth) => {
         tabBarShowLabel: false,
         tabBarActiveBackgroundColor: "#FF6C00",
         tabBarItemStyle: { borderRadius: 20, width: 70, height: 40 },
-        tabBarStyle: { paddingTop: 9, justifyContent: "center", paddingLeft: 82, paddingRight: 82, paddingBottom: 32 },
-        tabBarIconStyle: { color: '#212121CC'}
-
+        tabBarStyle: {
+          paddingTop: 9,
+          justifyContent: "center",
+          paddingLeft: 82,
+          paddingRight: 82,
+          paddingBottom: 32,
+        },
+        tabBarIconStyle: { color: "#212121CC" },
       }}
     >
       <MainTab.Screen
@@ -56,10 +61,14 @@ export const useRoute = (isAuth) => {
         }}
         name="PostsScreen"
         component={PostsScreen}
-        
       />
       <MainTab.Screen
         options={{
+          headerStyle: {
+            borderBottomColor: "#E5E5E5",
+            borderBottomWidth: 1,
+          },
+          headerTitleAlign: "center",
           tabBarIcon: ({ focused, size, color }) => (
             <AntDesign name="plus" size={24} color={color} />
           ),

@@ -3,35 +3,40 @@ import { createStackNavigator } from "@react-navigation/stack";
 import DefaultPostsScreen from "../NestedScreen/DefaultScreenPosts";
 import CommentsScreen from "../NestedScreen/CommentsScreens";
 import MapScreen from "../NestedScreen/MapScreen";
-import { Feather } from '@expo/vector-icons'; 
+import { Feather } from '@expo/vector-icons';
 import { Pressable } from "react-native";
-import { authSignOutUser } from "../../redux/auth/authOperation";
 import { useDispatch } from "react-redux";
-
-
+import { authSignOutUser } from "../../redux/auth/authOperation";
 
 const NestedScreens = createStackNavigator();
-const dispatch = useDispatch();
-
-const SigbOut = () => {
- dispatch(authSignOutUser)
-}
 
 const PostsScreen = ({navigation}) => {
- 
+const dispatch = useDispatch();
+const SignOut = () => {
+  dispatch(authSignOutUser());
+};
+
+
   return (
       <NestedScreens.Navigator>
         <NestedScreens.Screen
-          name="Публикации"
-          component={DefaultPostsScreen}
           options={{
+            headerStyle: {
+              borderBottomColor: '#E5E5E5',
+              borderBottomWidth: 1,
+},
+headerTitleAlign: "center",
             headerRight: () => (
-              <Pressable onPress={SigbOut}>
-<Feather name="log-out" size={24} color="black" />
+            <Pressable onPress={SignOut}>
+                <Feather
+                  name="log-out"
+                  style={{ marginRight: 10, color: "#BDBDBD" }}
+                  size={24}
+                />
                               </Pressable>)
-            }}
-
-                  />
+          }}
+          name="Публикации"
+          component={DefaultPostsScreen} />
         <NestedScreens.Screen name="Коментарии" component={CommentsScreen} />
         <NestedScreens.Screen name="Карта" component={MapScreen} />
       </NestedScreens.Navigator>

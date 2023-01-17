@@ -5,7 +5,10 @@ import { useRoute } from "./router";
 import * as SplashScreen from "expo-splash-screen";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
-import { isLoggedIn } from "./redux/auth/authOperation";
+import { useDispatch } from "react-redux";
+import {
+  getAuth,
+} from "firebase/auth";
 
 
 SplashScreen.preventAutoHideAsync();
@@ -18,8 +21,14 @@ export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [user, setUser] = useState(null)
   const routing = useRoute(user);
-  
-  isLoggedIn((user) => setUser(user));
+
+ const isLoggedIn = async () => {
+    const auth = getAuth();
+   await auth.onAuthStateChanged(async (user) => {
+      console.log("onAuthStateChanged called: ", user);
+       setUser(user);
+    });
+  };
 
   useEffect(() => {
     async function prepare() {
@@ -33,7 +42,7 @@ export default function App() {
         SplashScreen.hideAsync();
       }
     }
-
+    isLoggedIn()
     prepare();
   }, []);
 

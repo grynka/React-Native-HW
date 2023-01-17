@@ -1,5 +1,5 @@
 import { collection, addDoc } from "firebase/firestore"; 
-import {firebase} from "../../firebase/config";
+import {db} from "../../firebase/config";
 import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword } from "firebase/auth";
 
 
@@ -9,7 +9,7 @@ export const authSignInUser = (email, password) => async () => {
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
-      console.log(email, password)
+      console.log(user)
 
     })
     .catch((error) => {
@@ -36,12 +36,17 @@ export const authSignUpUser = (email, password, username, avatar) => async () =>
         displayName: username, photoURL: avatar})
      };
 
-export const writeDataToFirestore = async () => {
-    try {
+export const writeDataToFirestore = (image, geocode, name, location) => async () => {
+  console.log(db)
+   try {
         const docRef = await addDoc(collection(db, "users"), {
-          first: "Ada",
-          last: "Lovelace",
-          born: 1815
+         posts: {
+          uri: image,
+          id: image,
+          geocode: geocode,
+          name: name,
+          location: location,
+         }
         });
         console.log("Document written with ID: ", docRef.id);
       } catch (e) {
@@ -50,3 +55,15 @@ export const writeDataToFirestore = async () => {
   };
 
 export const authSignOutUser = () => async (dispatch, getState) => {};
+
+export const isLoggedIn  = async () => {
+  const auth = getAuth();
+
+auth.onAuthStateChanged(async (user) => {
+  console.log("onAuthStateChanged called: ", user);
+  if (user) {
+      await AsyncStorage.setItem('@isLoggedIn', '1');
+  } else {
+      await AsyncStorage.setItem('@isLoggedIn', '0');
+  }
+});}

@@ -5,6 +5,8 @@ import { useRoute } from "./router";
 import * as SplashScreen from "expo-splash-screen";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
+import { isLoggedIn } from "./redux/auth/authOperation";
+
 
 SplashScreen.preventAutoHideAsync();
 const fonts = {
@@ -14,7 +16,10 @@ const fonts = {
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
-  const routing = useRoute(false);
+  const [user, setUser] = useState(null)
+  const routing = useRoute(user);
+  
+  isLoggedIn((user) => setUser(user));
 
   useEffect(() => {
     async function prepare() {

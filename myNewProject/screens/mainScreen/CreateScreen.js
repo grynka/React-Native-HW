@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { writeDataToFirestore } from "../../redux/auth/authOperation";
+import { useDispatch } from "react-redux";
 import {
   TouchableOpacity,
   Image,
@@ -17,6 +19,7 @@ export default function CreateScreen({ navigation }) {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [geocode, setGeocode] = useState();
+  const dispatch = useDispatch();
 
   const startUserLocationUpdates = async () => {
     if (Platform.OS !== "web") {
@@ -32,6 +35,7 @@ export default function CreateScreen({ navigation }) {
       }
     }
   };
+
   const getGeocodeAsync = async () => {
     let geocode = await Location.reverseGeocodeAsync(location);
     setGeocode({ geocode });
@@ -60,7 +64,7 @@ export default function CreateScreen({ navigation }) {
   };
 
  const sendFoto = () => {
-  navigation.navigate('Публикации', {image, geocode, name, location});
+   dispatch(writeDataToFirestore(image, geocode, name, location));
  };
 
   return (

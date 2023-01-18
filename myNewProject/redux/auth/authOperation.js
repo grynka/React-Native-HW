@@ -14,7 +14,7 @@ export const authSignInUser = (email, password) => async (dispatch, getState) =>
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed in
-      dispatch(authSlice.actions.updateUserProfile(userCredential.user.displayName))
+      dispatch(authSlice.actions.updateUserProfile({uid: userCredential.user.uid, displayName: userCredential.user.displayName, email: userCredential.user.email, avatar: userCredential.user.photoURL}))
       console.log(user);
     })
     .catch((error) => {
@@ -76,6 +76,8 @@ signOut(auth).then(() => {
 export const isLoggedIn = async () => {
   const auth = getAuth();
  await auth.onAuthStateChanged(async (user) => {
+  dispatch(authSlice.actions.updateUserProfile({uid: user.uid, displayName: user.displayName}))
+
     console.log("onAuthStateChanged called: ", user);
       return user;
   });

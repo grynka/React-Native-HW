@@ -22,8 +22,8 @@ const SignOut = () => {
         <NestedScreens.Screen
           options={{
             headerStyle: {
-              borderBottomColor: '#E5E5E5',
-              borderBottomWidth: 1,
+              borderBottomColor: '#BDBDBD',
+              borderBottomWidth: 0.3,
 },
 headerTitleAlign: "center",
             headerRight: () => (
@@ -39,7 +39,6 @@ headerTitleAlign: "center",
           component={DefaultPostsScreen} />
         <NestedScreens.Screen name="Коментарии" component={CommentsScreen} />
         <NestedScreens.Screen name="Карта" component={MapScreen} />
-        <NestedScreens.Screen name="Создать публикацию" component={CreateScreen} />
       </NestedScreens.Navigator>
   );
 };

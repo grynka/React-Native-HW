@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AntDesign } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import { Ionicons } from '@expo/vector-icons'; 
+import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 const AuthStack = createStackNavigator();
@@ -65,11 +65,11 @@ export const useRoute = (isAuth) => {
         component={PostsScreen}
       />
       <MainTab.Screen
-            options={{
-            headerStyle: {
-            borderBottomColor: "#EEEEEE",
-            borderBottomWidth: 1,
-                      },
+        options={{
+          headerStyle: {
+            borderBottomColor: "#BDBDBD",
+            borderBottomWidth: 0.3,
+          },
           headerTitleAlign: "center",
           tabBarIcon: ({ focused, size, color }) => (
             <AntDesign name="plus" size={24} color={color} />
@@ -77,7 +77,6 @@ export const useRoute = (isAuth) => {
         }}
         name="Создать публикацию"
         component={CreateScreen}
-        
       />
       <MainTab.Screen
         options={{
@@ -87,7 +86,6 @@ export const useRoute = (isAuth) => {
           ),
         }}
         name="Profile"
-        
         component={ProfileScreen}
       />
     </MainTab.Navigator>

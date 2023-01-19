@@ -3,6 +3,8 @@ import { writeDataToFirestore } from "../../redux/auth/authOperation";
 import { useDispatch } from "react-redux";
 import {
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
   Image,
   View,
   Text,
@@ -13,13 +15,39 @@ import * as ImagePicker from "expo-image-picker";
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather, EvilIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import { Camera } from "expo-camera";
+import { getStorage } from "firebase/storage";
+
 
 export default function CreateScreen({ navigation }) {
+  const [isShowKeybord, setIsShowKeybord] = useState(false);
+  const [photo, setPhoto] = useState(null)
   const [image, setImage] = useState(null);
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
-  const [geocode, setGeocode] = useState();
+  const [geocode, setGeocode] = useState("");
   const dispatch = useDispatch();
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+
+  const keboardHide = () => {
+    setIsShowKeybord(false);
+    Keyboard.dismiss();
+  };
+
+  if (!permission) {
+    // Camera permissions are still loading
+    return <View />;
+  }
+
+  if (!permission.granted) {
+    // Camera permissions are not granted yet
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
+        <Button onPress={requestPermission} title="grant permission" />
+      </View>
+    );
+  }
 
   const startUserLocationUpdates = async () => {
     if (Platform.OS !== "web") {
@@ -38,13 +66,35 @@ export default function CreateScreen({ navigation }) {
 
   const getGeocodeAsync = async () => {
     let geocode = await Location.reverseGeocodeAsync(location);
+    console.log(geocode)
     setGeocode({ geocode });
     setGeocode(({ geocode }) => geocode[0]);
   };
-
   const nameHandler = (text) => setName(text);
+  const handleGeocode = (text) => setGeocode(text);
 
-  const pickImage = async () => {
+
+  const takePhoto = async () => {
+    startUserLocationUpdates();
+     const img = await photo.takePictureAsync();
+     const loc = await Location.getCurrentPositionAsync();
+
+     if (img) {
+       setLocation({
+         latitude: loc.coords.latitude,
+         longitude: loc.coords.longitude,
+       });
+       setImage(img.uri)
+     }
+     
+    }
+  
+
+ const sendFoto = () => {
+   dispatch(writeDataToFirestore(image, geocode, name, location));
+ };
+
+ const pickImage = async () => {
     startUserLocationUpdates();
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -63,18 +113,17 @@ export default function CreateScreen({ navigation }) {
     }
   };
 
- const sendFoto = () => {
-   dispatch(writeDataToFirestore(image, geocode, name, location));
- };
-
   return (
+    <TouchableWithoutFeedback onPress={keboardHide}>
     <View style={styles.container}>
       <View style={styles.head}>
         <View style={styles.addfoto}>
-          {image && <Image source={{ uri: image }} style={styles.foto} />}
+        <Camera style={styles.camera} ref={setPhoto}>
+        {image &&  <Image style={styles.takePhotoContainer} source={{uri: image}} />}
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
             title="Pick an image from camera roll"
-            onPress={pickImage}
+            onPress={takePhoto}
             style={{
               ...styles.addfotoIcon,
               backgroundColor: image ? "#FFFFFF4D" : "#FFFFFF",
@@ -87,9 +136,11 @@ export default function CreateScreen({ navigation }) {
             />
           </TouchableOpacity>
         </View>
-        <Text style={styles.fotoAction}>
-          {image ? "Редактировать фото" : "Загрузите фото"}
-        </Text>
+      </Camera>     
+        </View>
+       
+          {image ? <TouchableOpacity onPress={() => setImage(null)}><Text style={styles.fotoAction}>Редактировать фото</Text></TouchableOpacity> :  <TouchableOpacity onPress={pickImage}><Text style={styles.fotoAction}>Загрузите фото</Text></TouchableOpacity> }
+        
         <TextInput
           placeholder="Название..."
           style={styles.name}
@@ -97,15 +148,17 @@ export default function CreateScreen({ navigation }) {
           onChangeText={nameHandler}
         />
         <View style={styles.locationSection}>
-          <TouchableOpacity onPress={getGeocodeAsync}>
-            <EvilIcons name="location" style={styles.locationIcon} size={24} />
-          </TouchableOpacity>
+
           <TextInput
-            onFocus={getGeocodeAsync}
+            onLongPress = {getGeocodeAsync}
+            onChangeText={handleGeocode}
             placeholder="Местность..."
             style={styles.location}
-            value={geocode ? `${geocode.region}, ${geocode.country}` : ""}
+            value={geocode.region ? `${geocode.region}, ${geocode.country}` : geocode}
           />
+                    <TouchableOpacity onPress={getGeocodeAsync}>
+            <EvilIcons name="location" style={styles.locationIcon} size={24} />
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -138,10 +191,59 @@ export default function CreateScreen({ navigation }) {
         </TouchableOpacity>
       </View>
     </View>
+    </TouchableWithoutFeedback>
+
   );
 }
 
 const styles = StyleSheet.create({
+  takePhotoContainer: {
+position: "absolute",
+width: "100%",
+height: "100%",
+
+  },
+
+  camera: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignSelf: 'center',
+
+  },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    borderRadius: 8,
+    justifyContent: 'center',
+
+  },
+
+  shoot: {
+height: 32,
+width: 32,
+padding: 5,
+borderColor: "#FFFFFF",
+borderWidth: 2,
+borderRadius: 50,
+backgroundColor: '#FFFFFFFF',
+
+  },
+
+  flip: {
+    flex: 1,
+    marginLeft: 15,
+paddingBottom:15,
+  },
+
+  text: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+
   fotoAction: {
     fontSize: 16,
     fontFamily: "Roboto-Regular",
@@ -161,10 +263,7 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 16,
     paddingBottom: 32,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    borderColor: "#212121",
-  },
+    backgroundColor: "#FFFFFF",  },
 
   addfoto: {
     width: "100%",
@@ -231,7 +330,7 @@ const styles = StyleSheet.create({
   },
 
   locationSection: {
-    flexDirection: "row",
+    flexDirection: 'row-reverse',
     justifyContent: "flex-start",
     alignItems: "center",
     marginBottom: 32,
@@ -239,6 +338,7 @@ const styles = StyleSheet.create({
   locationIcon: {
     padding: 0,
     color: "#BDBDBD",
+    alignSelf: 'flex-start',
   },
 
   createButton: {

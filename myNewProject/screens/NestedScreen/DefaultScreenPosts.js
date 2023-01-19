@@ -10,7 +10,6 @@ const DefaultPostsScreen = ({ route, navigation }) => {
 
   const [posts, setPosts] = useState([]);
   useEffect(() => {
-    console.log(navigation)
     if (route.params) {
       setPosts((prevState) => [
         ...prevState,

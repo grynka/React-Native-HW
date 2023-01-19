@@ -12,6 +12,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
+import { authSignOutUser } from "../../redux/auth/authOperation";
 
 const ProfileScreen = () => {
   const { username, avatar } = useSelector((state) => state.auth);
@@ -34,9 +35,7 @@ const ProfileScreen = () => {
       quality: 1,
     });
 
-    console.log(result);
-
-    if (!result.canceled) {
+      if (!result.canceled) {
       setAvatarImg(result.assets[0].uri);
     }
   };
@@ -70,14 +69,14 @@ const ProfileScreen = () => {
               </Pressable>
             )}
           </View>
-          <Pressable style={styles.signout} onPress={SignOut}>
+          
+          <Text style={styles.name}>{username}</Text><Pressable style={styles.signout} onPress={SignOut}>
             <Feather
               name="log-out"
-              style={{ marginRight: 10, color: "#BDBDBD" }}
+              style={{ marginRight: 16, color: "#BDBDBD" }}
               size={24}
             />
           </Pressable>
-          <Text style={styles.name}>{username}</Text>
         </View>
       </ImageBackground>
     </View>
@@ -164,8 +163,9 @@ const styles = StyleSheet.create({
 
   signout: {
     justifyContent: "center",
-    marginTop: -67,
+    marginTop: -70,
     paddingBottom: 46,
+    alignItems: "flex-end",
   },
 
   name: {

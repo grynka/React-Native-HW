@@ -1,5 +1,5 @@
-import React from "react";
-import { AntDesign } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { AntDesign} from "@expo/vector-icons";
 import {
   View,
   Text,
@@ -7,71 +7,127 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 
-const CommentsScreen = ({ route }) => {
+const COMENTARS = [
+  {
+    author: "aurora",
+    avatar: require("../../assets/images/avatar.jpg"),
+    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
+  },
+  {
+    author: "vika",
+    avatar: require("../../assets/images/avatar.jpg"),
+    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
+  },
+  {
+    author: "lilia",
+    avatar: require("../../assets/images/avatar.jpg"),
+    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
+  },
+];
+
+const CommentsScreen = () => {
+  const [coment, setComent] = useState('');
+  const [comentars, setComentars] = useState(COMENTARS);
+
+const comentHandler = (text) => setComent(text);
+const addComent = () => {
+  setComentars((prevState) => [
+    ...prevState,
+    {
+     text: coment,
+     author: "vika",
+     avatar: require("../../assets/images/avatar.jpg"),
+    },]);
+    setComent('')
+};
+
   return (
-    <View style={{backgroundColor: '#FFFFFF'}}>
-      <Image
-        source={{ uri: route.params.item.uri }}
-        style={{
-          height: 240,
-          borderRadius: 8,
-          marginBottom: 8,
-          marginVertical: 32,
-          marginHorizontal: 16,
-        }}
-      />
-      <View>
-        <Text>Комент 1</Text>
-      </View>
-      <View>
-        <Text>Комент 2</Text>
-      </View>
-      <View>
-        <Text>Комент 3</Text>
-      </View>
+    <View style={{flex: 1, backgroundColor: "#FFFFFF", paddingHorizontal: 16 }}>
+      <ScrollView>
+        {comentars.map((comentar) => (
+          <View key={comentar.index} style={comentar.index % 2 === 0 ? styles.comentar : styles.comentar2}>
+          <Image source={comentar.avatar}   style={styles.avatar}/>
+          <Text  style={styles.text}>{comentar.text}</Text></View>
+        ))}
+      </ScrollView>
       <View style={styles.input}>
-        <TextInput placeholder="Комменттировать" style={styles.field} />
-        <TouchableOpacity style={styles.btn}>
+        <TextInput onChangeText={comentHandler} placeholder="Комментировать" style={styles.field} value={coment}/>
+        <TouchableOpacity style={styles.btn} onPress={addComent}>
           <AntDesign name="arrowup" size={20} color="white" />
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
-    btn: {
-      width: 34,
-      height: 34,
-      fontFamily: "Roboto-Regular",
-      borderRadius: 50,
-      backgroundColor: "#FF6C00",
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  
-    field: {
-      height: 50,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  
-    input: {
-      marginHorizontal: 16,
-      paddingRight: 8,
-      paddingLeft: 16,
-      height: 50,
-      borderColor: '#E8E8E8',
-      borderWidth: 1,
-      backgroundColor: '#F6F6F6',
-      color: '#BDBDBD',
-      borderRadius: 50,
-      flexDirection: 'row',
-      paddingVertical: 8,
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-  });
+  avatar: {
+    height: 28,
+    width: 28,
+    borderRadius: 50,
+    marginRight: 16,
+  },
+
+  comentar: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+    justifyContent: 'flex-start',
+  },
+
+  comentar2: {
+    flexDirection: 'row-reverse',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+    justifyContent: 'flex-end',
+  },
+
+  text: {
+backgroundColor: 'rgba(0, 0, 0, 0.03)',
+paddingHorizontal: 16,
+paddingTop: 16,
+paddingBottom: 8,
+borderTopRightRadius: 6,
+borderBottomLeftRadius: 6,
+borderBottomRightRadius: 6,
+flex: 1,
+
+  },
+
+  btn: {
+    width: 34,
+    height: 34,
+    fontFamily: "Roboto-Regular",
+    borderRadius: 50,
+    backgroundColor: "#FF6C00",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  field: {
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  input: {
+    paddingRight: 8,
+    paddingLeft: 16,
+    height: 50,
+    borderColor: "#E8E8E8",
+    borderWidth: 1,
+    backgroundColor: "#F6F6F6",
+    color: "#BDBDBD",
+    borderRadius: 50,
+    flexDirection: "row",
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+});
 
 export default CommentsScreen;

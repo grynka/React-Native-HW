@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import DefaultPostsScreen from "../NestedScreen/DefaultScreenPosts";
-import CommentsScreen from "../NestedScreen/CommentsScreens";
+import CommentsScreen from "./ProfileScreen";
 import MapScreen from "../NestedScreen/MapScreen";
 import { Feather } from '@expo/vector-icons';
 import { Pressable } from "react-native";

@@ -16,8 +16,7 @@ import ProfileScreen from "./screens/mainScreen/ProfileScreen";
 import PostsScreen from "./screens/mainScreen/PostsScreen";
 import CreateScreen from "./screens/mainScreen/CreatePostsScreen";
 
-export const useRoute = (isAuth, {navigation}) => {
-console.log({navigation})
+export const useRoute = (isAuth) => {
   if (!isAuth) {
     return (
       <AuthStack.Navigator initialRouteName="Login">
@@ -67,15 +66,10 @@ console.log({navigation})
       />
       <MainTab.Screen
             options={{
-              headerLeft: ({ navigation }) => (
-            <TouchableOpacity onPress={() => navigation.jumpTo("PostsScreen")}>
-              <Ionicons name="ios-arrow-back-sharp" size={24} color="black" />
-            </TouchableOpacity>),
-          headerStyle: {
+            headerStyle: {
             borderBottomColor: "#EEEEEE",
             borderBottomWidth: 1,
                       },
-          tabBarStyle: { display: "none" },
           headerTitleAlign: "center",
           tabBarIcon: ({ focused, size, color }) => (
             <AntDesign name="plus" size={24} color={color} />
@@ -87,11 +81,13 @@ console.log({navigation})
       />
       <MainTab.Screen
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, size, color }) => (
             <Feather name="user" size={24} color={color} />
           ),
         }}
         name="Profile"
+        
         component={ProfileScreen}
       />
     </MainTab.Navigator>

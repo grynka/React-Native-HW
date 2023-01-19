@@ -96,7 +96,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
                   style={{ marginRight: 5, color: "#BDBDBD" }}
                   size={24}
                 />
-                              </Pressable>
+              </Pressable>
 
                 <Text
                   style={{

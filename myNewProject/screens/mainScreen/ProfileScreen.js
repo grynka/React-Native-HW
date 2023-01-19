@@ -1,133 +1,180 @@
-import React, { useState } from "react";
-import { AntDesign} from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import { AntDesign } from "@expo/vector-icons";
 import {
   View,
   Text,
   Image,
-  TextInput,
+  ImageBackground,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
+  Pressable,
 } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+import * as ImagePicker from "expo-image-picker";
+import { Feather } from "@expo/vector-icons";
 
-const COMENTARS = [
-  {
-    author: "aurora",
-    avatar: require("../../assets/images/avatar.jpg"),
-    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
-  },
-  {
-    author: "vika",
-    avatar: require("../../assets/images/avatar.jpg"),
-    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
-  },
-  {
-    author: "lilia",
-    avatar: require("../../assets/images/avatar.jpg"),
-    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
-  },
-];
+const ProfileScreen = () => {
+  const { username, avatar } = useSelector((state) => state.auth);
+  const [avatarImg, setAvatarImg] = useState("");
+  const dispatch = useDispatch();
+  const SignOut = () => {
+    dispatch(authSignOutUser());
+  };
 
-const CommentsScreen = () => {
-  const [coment, setComent] = useState('');
-  const [comentars, setComentars] = useState(COMENTARS);
+  useEffect(() => {
+    setAvatarImg(avatar);
+  }, []);
 
-const comentHandler = (text) => setComent(text);
-const addComent = () => {
-  setComentars((prevState) => [
-    ...prevState,
-    {
-     text: coment,
-     author: "vika",
-     avatar: require("../../assets/images/avatar.jpg"),
-    },]);
-    setComent('')
-};
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setAvatarImg(result.assets[0].uri);
+    }
+  };
 
   return (
-    <View style={{flex: 1, backgroundColor: "#FFFFFF", paddingHorizontal: 16 }}>
-      <ScrollView>
-        {comentars.map((comentar) => (
-          <View key={comentar.index} style={comentar.index % 2 === 0 ? styles.comentar : styles.comentar2}>
-          <Image source={comentar.avatar}   style={styles.avatar}/>
-          <Text  style={styles.text}>{comentar.text}</Text></View>
-        ))}
-      </ScrollView>
-      <View style={styles.input}>
-        <TextInput onChangeText={comentHandler} placeholder="Комментировать" style={styles.field} value={coment}/>
-        <TouchableOpacity style={styles.btn} onPress={addComent}>
-          <AntDesign name="arrowup" size={20} color="white" />
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      <ImageBackground
+        style={styles.image}
+        source={require("../../assets/images/BG.jpg")}
+      >
+        <View style={styles.content}>
+          <View style={styles.inputAvatar}>
+            {avatarImg && (
+              <Image source={{ uri: avatarImg }} style={styles.avatar} />
+            )}
+
+            {avatarImg ? (
+              <Pressable
+                style={styles.delAvatar}
+                onPress={() => setAvatarImg(null)}
+              >
+                <Text style={styles.addAvatarUnion}>
+                  <AntDesign name="close" size={24} color="#BDBDBD" />
+                </Text>
+              </Pressable>
+            ) : (
+              <Pressable style={styles.addAvatar} onPress={pickImage}>
+                <Text style={styles.addAvatarUnion}>
+                  <AntDesign name="plus" size={20} color="#FF6C00" />
+                </Text>
+              </Pressable>
+            )}
+          </View>
+          <Pressable style={styles.signout} onPress={SignOut}>
+            <Feather
+              name="log-out"
+              style={{ marginRight: 10, color: "#BDBDBD" }}
+              size={24}
+            />
+          </Pressable>
+          <Text style={styles.name}>{username}</Text>
+        </View>
+      </ImageBackground>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  avatar: {
-    height: 28,
-    width: 28,
-    borderRadius: 50,
-    marginRight: 16,
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+    justifyContent: "center",
   },
 
-  comentar: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 24,
-    justifyContent: 'flex-start',
-  },
-
-  comentar2: {
-    flexDirection: 'row-reverse',
-    alignItems: 'flex-start',
-    marginBottom: 24,
-    justifyContent: 'flex-end',
-  },
-
-  text: {
-backgroundColor: 'rgba(0, 0, 0, 0.03)',
-paddingHorizontal: 16,
-paddingTop: 16,
-paddingBottom: 8,
-borderTopRightRadius: 6,
-borderBottomLeftRadius: 6,
-borderBottomRightRadius: 6,
-flex: 1,
-
-  },
-
-  btn: {
-    width: 34,
-    height: 34,
+  content: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
     fontFamily: "Roboto-Regular",
+    height: "100%",
+  },
+
+  avatar: {
+    borderRadius: 8,
+    width: 120,
+    height: 120,
+    marginRight: 0,
+    marginBottom: -39,
+  },
+
+  addAvatar: {
+    color: "#FF6C00",
     borderRadius: 50,
-    backgroundColor: "#FF6C00",
+    borderWidth: 1,
+    borderColor: "#FF6C00",
+    width: 25,
+    height: 25,
     justifyContent: "center",
     alignItems: "center",
+    marginRight: -13,
+    backgroundColor: "#FFFFFF",
   },
 
-  field: {
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  input: {
-    paddingRight: 8,
-    paddingLeft: 16,
-    height: 50,
+  delAvatar: {
     borderColor: "#E8E8E8",
     borderWidth: 1,
-    backgroundColor: "#F6F6F6",
-    color: "#BDBDBD",
+    backgroundColor: "#FFFFFF",
     borderRadius: 50,
-    flexDirection: "row",
-    paddingVertical: 8,
+    marginRight: -13,
+    width: 25,
+    height: 25,
+    justifyContent: "center",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 16,
+  },
+
+  addAvatarUnion: {
+    color: "#FF6C00",
+    fontSize: 13,
+    padding: 0,
+    margin: 0,
+  },
+
+  inputAvatar: {
+    height: 120,
+    marginBottom: 32,
+    borderColor: "#E8E8E8",
+    borderRadius: 8,
+    backgroundColor: "#F6F6F6",
+    color: "#212121",
+    fontSize: 16,
+    width: 120,
+    alignSelf: "center",
+    marginTop: -67,
+    justifyContent: "flex-end",
+    paddingBottom: 14,
+    alignItems: "flex-end",
+  },
+
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "flex-start",
+    paddingTop: 147,
+  },
+
+  signout: {
+    justifyContent: "center",
+    marginTop: -67,
+    paddingBottom: 46,
+  },
+
+  name: {
+    fontFamily: "Roboto-Regular",
+    fontSize: 30,
+    color: "#212121",
+    justifyContent: "center",
+    textAlign: "center",
   },
 });
 
-export default CommentsScreen;
+export default ProfileScreen;

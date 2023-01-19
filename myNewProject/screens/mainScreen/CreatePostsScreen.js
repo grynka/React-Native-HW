@@ -16,7 +16,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather, EvilIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { Camera } from "expo-camera";
-import { getStorage } from "firebase/storage";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 
 export default function CreateScreen({ navigation }) {
@@ -48,6 +48,18 @@ export default function CreateScreen({ navigation }) {
       </View>
     );
   }
+
+  const uploadPhotoToServer = async (image) => {
+    const response = await fetch(image)
+    console.log(response)
+    const file = await response.blob()
+    console.log(file)
+    const uniquePostId = Date.now().toString()
+    const storage = await getStorage();
+    const data = await ref(storage, `postImages/${uniquePostId}`);
+    const upload = await uploadBytes(data, file)
+    console.log(upload)
+  };
 
   const startUserLocationUpdates = async () => {
     if (Platform.OS !== "web") {
@@ -91,7 +103,7 @@ export default function CreateScreen({ navigation }) {
   
 
  const sendFoto = () => {
-   dispatch(writeDataToFirestore(image, geocode, name, location));
+    uploadPhotoToServer(image)
  };
 
  const pickImage = async () => {

@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AntDesign } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const AuthStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -12,9 +13,10 @@ import LoginScreen from "./screens/auth/LoginScreen";
 import RegistrationScreen from "./screens/auth/RegistrationScreen";
 import ProfileScreen from "./screens/mainScreen/ProfileScreen";
 import PostsScreen from "./screens/mainScreen/PostsScreen";
-import CreateScreen from "./screens/mainScreen/CreateScreen";
+import CreateScreen from "./screens/mainScreen/CreatePostsScreen";
 
 export const useRoute = (isAuth) => {
+
   if (!isAuth) {
     return (
       <AuthStack.Navigator initialRouteName="Login">
@@ -63,11 +65,18 @@ export const useRoute = (isAuth) => {
         component={PostsScreen}
       />
       <MainTab.Screen
-        options={{
+     
+          
+            options={{
+              headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.navigate("PostsScreen")}>
+              <MaterialCommunityIcons name="keyboard-backspace" size={24} color="black" />
+            </TouchableOpacity>),
           headerStyle: {
-            borderBottomColor: "#E5E5E5",
+            borderBottomColor: "#EEEEEE",
             borderBottomWidth: 1,
-          },
+                      },
+          tabBarStyle: { display: "none" },
           headerTitleAlign: "center",
           tabBarIcon: ({ focused, size, color }) => (
             <AntDesign name="plus" size={24} color={color} />
@@ -75,6 +84,7 @@ export const useRoute = (isAuth) => {
         }}
         name="Создать публикацию"
         component={CreateScreen}
+        
       />
       <MainTab.Screen
         options={{

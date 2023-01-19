@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { Pressable } from "react-native";
 import { useDispatch } from "react-redux";
 import { authSignOutUser } from "../../redux/auth/authOperation";
+import CreateScreen from "./CreatePostsScreen";
 
 const NestedScreens = createStackNavigator();
 
@@ -15,6 +16,7 @@ const dispatch = useDispatch();
 const SignOut = () => {
   dispatch(authSignOutUser());
 };
+
 
 
   return (
@@ -39,6 +41,7 @@ headerTitleAlign: "center",
           component={DefaultPostsScreen} />
         <NestedScreens.Screen name="Коментарии" component={CommentsScreen} />
         <NestedScreens.Screen name="Карта" component={MapScreen} />
+        <NestedScreens.Screen name="Создать публикацию" component={CreateScreen} />
       </NestedScreens.Navigator>
   );
 };

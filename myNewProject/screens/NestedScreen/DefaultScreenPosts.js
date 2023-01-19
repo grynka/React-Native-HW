@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Text, FlatList, Image, View, StyleSheet, Pressable } from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
+
 
 const DefaultPostsScreen = ({ route, navigation }) => {
-  const [posts, setPosts] = useState([]);
-  const [name, setName] = useState("Natali Romanova");
-  const [mail, setMail] = useState("mail@example.com");
-  const [avatar, setAvatar] = useState(require("../../assets/images/BG.jpg"));
+  const {username, email, avatar } = useSelector((state) => state.auth)
 
+  const [posts, setPosts] = useState([]);
   useEffect(() => {
+    console.log(navigation)
     if (route.params) {
       setPosts((prevState) => [
         ...prevState,
@@ -29,13 +30,13 @@ const DefaultPostsScreen = ({ route, navigation }) => {
       <View style={styles.profile}>
         {avatar && (
           <Image
-            source={require("../../assets/images/avatar.jpg")}
+            source={{uri: avatar}}
             style={styles.avatar}
           />
         )}
         <View style={styles.text}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.mail}>{mail}</Text>
+          <Text style={styles.name}>{username}</Text>
+          <Text style={styles.mail}>{email}</Text>
         </View>
       </View>
 

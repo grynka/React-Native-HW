@@ -1,14 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import * as Font from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
-import { useRoute } from "./router";
 import * as SplashScreen from "expo-splash-screen";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
-import { useDispatch } from "react-redux";
-import {
-  getAuth,
-} from "firebase/auth";
+import Main from "./components/Main";
+
 
 
 SplashScreen.preventAutoHideAsync();
@@ -19,16 +15,6 @@ const fonts = {
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
-  const [user, setUser] = useState(null)
-  const routing = useRoute(user);
-
- const isLoggedIn = async () => {
-    const auth = getAuth();
-   await auth.onAuthStateChanged(async (user) => {
-      console.log("onAuthStateChanged called: ", user);
-       setUser(user);
-    });
-  };
 
   useEffect(() => {
     async function prepare() {
@@ -42,7 +28,6 @@ export default function App() {
         SplashScreen.hideAsync();
       }
     }
-    isLoggedIn()
     prepare();
   }, []);
 
@@ -52,7 +37,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <NavigationContainer>{routing}</NavigationContainer>
+    <Main />
     </Provider>
   );
 }

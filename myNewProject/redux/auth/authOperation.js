@@ -64,21 +64,22 @@ export const writeDataToFirestore =
   };
 
 export const authSignOutUser = () => async (dispatch, getState) => {
-  console.log('запуск вихода')
   const auth = getAuth();
 signOut(auth).then(() => {
  console.log('Sign-out successful.')
+ dispatch(authSlice.actions.authSignOut())
 }).catch((error) => {
   console.log(error)
 });
 };
 
-export const isLoggedIn = async () => {
+export const authStateChangeUser = () => async (dispatch, getState) => {
   const auth = getAuth();
- await auth.onAuthStateChanged(async (user) => {
-  dispatch(authSlice.actions.updateUserProfile({uid: user.uid, displayName: user.displayName}))
-
-    console.log("onAuthStateChanged called: ", user);
-      return user;
+  await auth.onAuthStateChanged((user) => {
+    if(user){
+      console.log("пользователь", user);
+      dispatch(authSlice.actions.updateUserProfile({uid: user.uid, displayName: user.displayName, email: user.email, avatar: user.photoURL}));
+      dispatch(authSlice.actions.authStateChange({stateChange: true}))
+    }
   });
 };

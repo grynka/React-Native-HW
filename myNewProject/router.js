@@ -4,7 +4,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AntDesign } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons'; 
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const AuthStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -15,8 +16,8 @@ import ProfileScreen from "./screens/mainScreen/ProfileScreen";
 import PostsScreen from "./screens/mainScreen/PostsScreen";
 import CreateScreen from "./screens/mainScreen/CreatePostsScreen";
 
-export const useRoute = (isAuth) => {
-
+export const useRoute = (isAuth, {navigation}) => {
+console.log({navigation})
   if (!isAuth) {
     return (
       <AuthStack.Navigator initialRouteName="Login">
@@ -65,12 +66,10 @@ export const useRoute = (isAuth) => {
         component={PostsScreen}
       />
       <MainTab.Screen
-     
-          
             options={{
-              headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.navigate("PostsScreen")}>
-              <MaterialCommunityIcons name="keyboard-backspace" size={24} color="black" />
+              headerLeft: ({ navigation }) => (
+            <TouchableOpacity onPress={() => navigation.jumpTo("PostsScreen")}>
+              <Ionicons name="ios-arrow-back-sharp" size={24} color="black" />
             </TouchableOpacity>),
           headerStyle: {
             borderBottomColor: "#EEEEEE",

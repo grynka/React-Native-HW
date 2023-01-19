@@ -17,8 +17,6 @@ const SignOut = () => {
   dispatch(authSignOutUser());
 };
 
-
-
   return (
       <NestedScreens.Navigator>
         <NestedScreens.Screen

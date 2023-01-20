@@ -94,7 +94,7 @@ export default function CreateScreen({ navigation }) {
     const photo = await uploadPhotoToServer(image)
     console.log(photo)
     try {
-      const docRef = await addDoc(collection(db, "users"), {
+      const docRef = await addDoc(collection(db, "posts"), {
 photo, name, location, geocode
       });
       console.log("Document written with ID: ", docRef.id);

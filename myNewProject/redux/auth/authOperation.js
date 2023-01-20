@@ -46,9 +46,8 @@ export const authSignUpUser =
 
 export const writeDataToFirestore =
   (image, geocode, name, location) => async () => {
-    console.log(db);
     try {
-      const docRef = await addDoc(collection(db, "users"), {
+      const docRef = await addDoc(collection(db, "posts"), {
         posts: {
           uri: image,
           id: image,

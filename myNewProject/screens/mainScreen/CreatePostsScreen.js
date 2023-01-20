@@ -16,8 +16,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Feather, EvilIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { Camera } from "expo-camera";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
-
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore"; 
+import  db  from "../../firebase/config";
 
 export default function CreateScreen({ navigation }) {
   const [isShowKeybord, setIsShowKeybord] = useState(false);
@@ -51,14 +52,13 @@ export default function CreateScreen({ navigation }) {
 
   const uploadPhotoToServer = async (image) => {
     const response = await fetch(image)
-    console.log(response)
     const file = await response.blob()
-    console.log(file)
     const uniquePostId = Date.now().toString()
     const storage = await getStorage();
     const data = await ref(storage, `postImages/${uniquePostId}`);
-    const upload = await uploadBytes(data, file)
-    console.log(upload)
+    await uploadBytes(data, file)
+    const processedPhoto = await getDownloadURL(data);
+    return processedPhoto
   };
 
   const startUserLocationUpdates = async () => {
@@ -73,7 +73,12 @@ export default function CreateScreen({ navigation }) {
         );
         return;
       }
-    }
+      const loc = await Location.getCurrentPositionAsync();
+      setLocation({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      });
+          }
   };
 
   const getGeocodeAsync = async () => {
@@ -85,25 +90,31 @@ export default function CreateScreen({ navigation }) {
   const nameHandler = (text) => setName(text);
   const handleGeocode = (text) => setGeocode(text);
 
+  const uploadPostsToServer = async () => {
+    const photo = await uploadPhotoToServer(image)
+    console.log(photo)
+    try {
+      const docRef = await addDoc(collection(db, "users"), {
+photo, name, location, geocode
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+          
+  }
 
   const takePhoto = async () => {
     startUserLocationUpdates();
-     const img = await photo.takePictureAsync();
-     const loc = await Location.getCurrentPositionAsync();
-
-     if (img) {
-       setLocation({
-         latitude: loc.coords.latitude,
-         longitude: loc.coords.longitude,
-       });
-       setImage(img.uri)
-     }
-     
+    const img = await photo.takePictureAsync();
+      setImage(img.uri)
     }
   
 
  const sendFoto = () => {
-    uploadPhotoToServer(image)
+    uploadPostsToServer()
+  //  dispatch(writeDataToFirestore(image, geocode, name, location))
+    navigation.navigate("PostsScreen", {image, name, geocode})
  };
 
  const pickImage = async () => {

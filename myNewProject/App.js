@@ -7,7 +7,10 @@ import Main from "./components/Main";
 
 
 
+
+
 SplashScreen.preventAutoHideAsync();
+
 const fonts = {
   "Roboto-Regular": require("./assets/fonts/Roboto/Roboto-Regular.ttf"),
   "Roboto-Medium": require("./assets/fonts/Roboto/Roboto-Medium.ttf"),

@@ -7,7 +7,6 @@ import { Feather } from '@expo/vector-icons';
 import { Pressable } from "react-native";
 import { useDispatch } from "react-redux";
 import { authSignOutUser } from "../../redux/auth/authOperation";
-import CreateScreen from "./CreatePostsScreen";
 
 const NestedScreens = createStackNavigator();
 

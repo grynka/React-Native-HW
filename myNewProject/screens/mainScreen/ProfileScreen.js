@@ -38,7 +38,21 @@ const ProfileScreen = () => {
       if (!result.canceled) {
       setAvatarImg(result.assets[0].uri);
     }
+
+    const getAllPosts = async () => {
+      const querySnapshot = await getDocs(collection(db, "posts"));
+      querySnapshot.forEach((doc) => 
+      setPosts({...doc.data(), id: doc.id}),
+      console.log(posts)
+      )
+        }
+      
+        
+        useEffect(() => {
+          getAllPosts()
+             }, []);
   };
+
 
   return (
     <View style={styles.container}>

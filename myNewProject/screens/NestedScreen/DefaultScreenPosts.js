@@ -3,26 +3,29 @@ import { Text, FlatList, Image, View, StyleSheet, Pressable } from "react-native
 import { EvilIcons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
+import { collection, getDocs } from "firebase/firestore"; 
+import db from "../../firebase/config";
 
 
-const DefaultPostsScreen = ({ route, navigation }) => {
-  const {username, email, avatar } = useSelector((state) => state.auth)
+const DefaultPostsScreen = ({ navigation }) => {
+const {username, email, avatar } = useSelector((state) => state.auth)
+const [posts, setPosts] = useState([]);
 
-  const [posts, setPosts] = useState([]);
+const getAllPosts = async () => {
+const querySnapshot = await getDocs(collection(db, "posts"));
+await querySnapshot.forEach((doc) => {
+  setPosts(doc.id)
+  console.log(doc.id, " => ", doc.data());
+  console.log(posts)
+});
+await console.log(posts)
+
+  }
+
+  
   useEffect(() => {
-    if (route.params) {
-      setPosts((prevState) => [
-        ...prevState,
-        {
-          uri: route.params.image,
-          id: route.key,
-          geocode: route.params.geocode,
-          name: route.params.name,
-          location: route.params.location,
-        },
-      ]);
-    }
-  }, [route.params]);
+   getAllPosts()
+       }, []);
 
   return (
     <View style={styles.posts}>
@@ -46,7 +49,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
         renderItem={({ item }) => (
           <View style={{ flex: 1 }}>
             <Image
-              source={{ uri: item.uri }}
+              source={{ uri: item.photo }}
               style={{
                 height: 240,
                 borderRadius: 8,
@@ -62,7 +65,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
                 marginBottom: 8,
               }}
             >
-              {item.name}
+              {name}
             </Text>
             <View
               style={{
@@ -105,7 +108,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
                     fontSize: 16,
                   }}
                 >
-                  {`${item.geocode.city}, ${item.geocode.country}`}
+                  {item.geocode.city ? `${item.geocode.city}, ${item.geocode.country}` : geocode}
                 </Text>
               </View>
             </View>

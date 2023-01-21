@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { writeDataToFirestore } from "../../redux/auth/authOperation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -17,18 +17,20 @@ import { Feather, EvilIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { Camera } from "expo-camera";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore"; 
-import  db  from "../../firebase/config";
+import { collection, addDoc } from "firebase/firestore";
+import db from "../../firebase/config";
 
 export default function CreateScreen({ navigation }) {
   const [isShowKeybord, setIsShowKeybord] = useState(false);
-  const [photo, setPhoto] = useState(null)
+  const [photo, setPhoto] = useState(null);
   const [image, setImage] = useState(null);
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [geocode, setGeocode] = useState("");
   const dispatch = useDispatch();
   const [permission, requestPermission] = Camera.useCameraPermissions();
+
+  const { uid, username } = useSelector((state) => state.auth);
 
   const keboardHide = () => {
     setIsShowKeybord(false);
@@ -44,21 +46,23 @@ export default function CreateScreen({ navigation }) {
     // Camera permissions are not granted yet
     return (
       <View style={styles.container}>
-        <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
+        <Text style={{ textAlign: "center" }}>
+          We need your permission to show the camera
+        </Text>
         <Button onPress={requestPermission} title="grant permission" />
       </View>
     );
   }
 
   const uploadPhotoToServer = async (image) => {
-    const response = await fetch(image)
-    const file = await response.blob()
-    const uniquePostId = Date.now().toString()
+    const response = await fetch(image);
+    const file = await response.blob();
+    const uniquePostId = Date.now().toString();
     const storage = await getStorage();
     const data = await ref(storage, `postImages/${uniquePostId}`);
-    await uploadBytes(data, file)
+    await uploadBytes(data, file);
     const processedPhoto = await getDownloadURL(data);
-    return processedPhoto
+    return processedPhoto;
   };
 
   const startUserLocationUpdates = async () => {
@@ -78,12 +82,12 @@ export default function CreateScreen({ navigation }) {
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
       });
-          }
+    }
   };
 
   const getGeocodeAsync = async () => {
     let geocode = await Location.reverseGeocodeAsync(location);
-    console.log(geocode)
+    console.log(geocode);
     setGeocode({ geocode });
     setGeocode(({ geocode }) => geocode[0]);
   };
@@ -91,33 +95,36 @@ export default function CreateScreen({ navigation }) {
   const handleGeocode = (text) => setGeocode(text);
 
   const uploadPostsToServer = async () => {
-    const photo = await uploadPhotoToServer(image)
-    console.log(photo)
+    const photo = await uploadPhotoToServer(image);
+    console.log(photo);
     try {
       const docRef = await addDoc(collection(db, "posts"), {
-photo, name, location, geocode
+        photo,
+        name,
+        location,
+        geocode,
+        username,
+        uid,
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
-          
-  }
+  };
 
   const takePhoto = async () => {
     startUserLocationUpdates();
     const img = await photo.takePictureAsync();
-      setImage(img.uri)
-    }
-  
+    setImage(img.uri);
+  };
 
- const sendFoto = () => {
-    uploadPostsToServer()
-  //  dispatch(writeDataToFirestore(image, geocode, name, location))
-    navigation.navigate("PostsScreen", {image, name, geocode})
- };
+  const sendFoto = () => {
+    uploadPostsToServer();
+    //  dispatch(writeDataToFirestore(image, geocode, name, location))
+    navigation.navigate("PostsScreen", { image, name, geocode });
+  };
 
- const pickImage = async () => {
+  const pickImage = async () => {
     startUserLocationUpdates();
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -138,133 +145,148 @@ photo, name, location, geocode
 
   return (
     <TouchableWithoutFeedback onPress={keboardHide}>
-    <View style={styles.container}>
-      <View style={styles.head}>
-        <View style={styles.addfoto}>
-        <Camera style={styles.camera} ref={setPhoto}>
-        {image &&  <Image style={styles.takePhotoContainer} source={{uri: image}} />}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            title="Pick an image from camera roll"
-            onPress={takePhoto}
-            style={{
-              ...styles.addfotoIcon,
-              backgroundColor: image ? "#FFFFFF4D" : "#FFFFFF",
-            }}
-          >
-            <FontAwesome
-              name="camera"
-              size={20}
-              color={image ? "#FFFFFF" : "#BDBDBD"}
-            />
-          </TouchableOpacity>
-        </View>
-      </Camera>     
-        </View>
-       
-          {image ? <TouchableOpacity onPress={() => setImage(null)}><Text style={styles.fotoAction}>Редактировать фото</Text></TouchableOpacity> :  <TouchableOpacity onPress={pickImage}><Text style={styles.fotoAction}>Загрузите фото</Text></TouchableOpacity> }
-        
-        <TextInput
-          placeholder="Название..."
-          style={styles.name}
-          value={name}
-          onChangeText={nameHandler}
-        />
-        <View style={styles.locationSection}>
+      <View style={styles.container}>
+        <View style={styles.head}>
+          <View style={styles.addfoto}>
+            <Camera style={styles.camera} ref={setPhoto}>
+              {image && (
+                <Image
+                  style={styles.takePhotoContainer}
+                  source={{ uri: image }}
+                />
+              )}
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  title="Pick an image from camera roll"
+                  onPress={takePhoto}
+                  style={{
+                    ...styles.addfotoIcon,
+                    backgroundColor: image ? "#FFFFFF4D" : "#FFFFFF",
+                  }}
+                >
+                  <FontAwesome
+                    name="camera"
+                    size={20}
+                    color={image ? "#FFFFFF" : "#BDBDBD"}
+                  />
+                </TouchableOpacity>
+              </View>
+            </Camera>
+          </View>
+
+          {image ? (
+            <TouchableOpacity onPress={() => setImage(null)}>
+              <Text style={styles.fotoAction}>Редактировать фото</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={pickImage}>
+              <Text style={styles.fotoAction}>Загрузите фото</Text>
+            </TouchableOpacity>
+          )}
 
           <TextInput
-            onLongPress = {getGeocodeAsync}
-            onChangeText={handleGeocode}
-            placeholder="Местность..."
-            style={styles.location}
-            value={geocode.region ? `${geocode.region}, ${geocode.country}` : geocode}
+            placeholder="Название..."
+            style={styles.name}
+            value={name}
+            onChangeText={nameHandler}
           />
-                    <TouchableOpacity onPress={getGeocodeAsync}>
-            <EvilIcons name="location" style={styles.locationIcon} size={24} />
+          <View style={styles.locationSection}>
+            <TextInput
+              onLongPress={getGeocodeAsync}
+              onChangeText={handleGeocode}
+              placeholder="Местность..."
+              style={styles.location}
+              value={
+                geocode.region
+                  ? `${geocode.region}, ${geocode.country}`
+                  : geocode
+              }
+            />
+            <TouchableOpacity onPress={getGeocodeAsync}>
+              <EvilIcons
+                name="location"
+                style={styles.locationIcon}
+                size={24}
+              />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={{
+              ...styles.createButton,
+              backgroundColor: image ? "#FF6C00" : "#F6F6F6",
+            }}
+            onPress={sendFoto}
+          >
+            <Text
+              style={{
+                color: image ? "#FFFFFF" : "#BDBDBD",
+                fontSize: 16,
+                fontFamily: "Roboto-Regular",
+              }}
+            >
+              Опубликовать
+            </Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={{
-            ...styles.createButton,
-            backgroundColor: image ? "#FF6C00" : "#F6F6F6",
-          }}
-          onPress={sendFoto}
-        >
-          <Text
-            style={{
-              color: image ? "#FFFFFF" : "#BDBDBD",
-              fontSize: 16,
-              fontFamily: "Roboto-Regular",
+
+        <View style={styles.bottom}>
+          <TouchableOpacity
+            onPress={() => {
+              setImage(null), setGeocode(null);
             }}
+            style={styles.delete}
           >
-            Опубликовать
-          </Text>
-        </TouchableOpacity>
+            <Feather name="trash-2" size={24} color="#BDBDBD" />
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <View style={styles.bottom}>
-        <TouchableOpacity
-          onPress={() => {
-            setImage(null), setGeocode(null);
-          }}
-          style={styles.delete}
-        >
-          <Feather name="trash-2" size={24} color="#BDBDBD" />
-        </TouchableOpacity>
-      </View>
-    </View>
     </TouchableWithoutFeedback>
-
   );
 }
 
 const styles = StyleSheet.create({
   takePhotoContainer: {
-position: "absolute",
-width: "100%",
-height: "100%",
-
+    position: "absolute",
+    width: "100%",
+    height: "100%",
   },
 
   camera: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 8,
-    justifyContent: 'center',
-    alignSelf: 'center',
-
+    justifyContent: "center",
+    alignSelf: "center",
   },
 
   buttonContainer: {
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
+    flexDirection: "row",
+    backgroundColor: "transparent",
     borderRadius: 8,
-    justifyContent: 'center',
-
+    justifyContent: "center",
   },
 
   shoot: {
-height: 32,
-width: 32,
-padding: 5,
-borderColor: "#FFFFFF",
-borderWidth: 2,
-borderRadius: 50,
-backgroundColor: '#FFFFFFFF',
-
+    height: 32,
+    width: 32,
+    padding: 5,
+    borderColor: "#FFFFFF",
+    borderWidth: 2,
+    borderRadius: 50,
+    backgroundColor: "#FFFFFFFF",
   },
 
   flip: {
     flex: 1,
     marginLeft: 15,
-paddingBottom:15,
+    paddingBottom: 15,
   },
 
   text: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
   },
 
   fotoAction: {
@@ -286,7 +308,8 @@ paddingBottom:15,
     paddingLeft: 16,
     paddingRight: 16,
     paddingBottom: 32,
-    backgroundColor: "#FFFFFF",  },
+    backgroundColor: "#FFFFFF",
+  },
 
   addfoto: {
     width: "100%",
@@ -353,7 +376,7 @@ paddingBottom:15,
   },
 
   locationSection: {
-    flexDirection: 'row-reverse',
+    flexDirection: "row-reverse",
     justifyContent: "flex-start",
     alignItems: "center",
     marginBottom: 32,
@@ -361,7 +384,7 @@ paddingBottom:15,
   locationIcon: {
     padding: 0,
     color: "#BDBDBD",
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
 
   createButton: {

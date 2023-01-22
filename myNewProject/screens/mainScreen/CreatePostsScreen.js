@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { writeDataToFirestore } from "../../redux/auth/authOperation";
 import { useDispatch, useSelector } from "react-redux";
 import {
   TouchableOpacity,
@@ -54,17 +53,6 @@ export default function CreateScreen({ navigation }) {
     );
   }
 
-  const uploadPhotoToServer = async (image) => {
-    const response = await fetch(image);
-    const file = await response.blob();
-    const uniquePostId = Date.now().toString();
-    const storage = await getStorage();
-    const data = await ref(storage, `postImages/${uniquePostId}`);
-    await uploadBytes(data, file);
-    const processedPhoto = await getDownloadURL(data);
-    return processedPhoto;
-  };
-
   const startUserLocationUpdates = async () => {
     if (Platform.OS !== "web") {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -77,6 +65,7 @@ export default function CreateScreen({ navigation }) {
         );
         return;
       }
+
       const loc = await Location.getCurrentPositionAsync();
       setLocation({
         latitude: loc.coords.latitude,
@@ -112,16 +101,28 @@ export default function CreateScreen({ navigation }) {
     }
   };
 
+
   const takePhoto = async () => {
     startUserLocationUpdates();
     const img = await photo.takePictureAsync();
     setImage(img.uri);
   };
 
+  const uploadPhotoToServer = async (image) => {
+    const response = await fetch(image);
+    const file = await response.blob();
+    const uniquePostId = Date.now().toString();
+    const storage = await getStorage();
+    const data = await ref(storage, `postImages/${uniquePostId}`);
+    await uploadBytes(data, file);
+    const processedPhoto = await getDownloadURL(data);
+    return processedPhoto;
+  };
+  
   const sendFoto = () => {
     uploadPostsToServer();
-    //  dispatch(writeDataToFirestore(image, geocode, name, location))
-    navigation.navigate("PostsScreen", { image, name, geocode });
+    navigation.navigate("PostsScreen");
+    
   };
 
   const pickImage = async () => {
@@ -233,7 +234,7 @@ export default function CreateScreen({ navigation }) {
         <View style={styles.bottom}>
           <TouchableOpacity
             onPress={() => {
-              setImage(null), setGeocode(null);
+              setImage(null), setGeocode('');
             }}
             style={styles.delete}
           >

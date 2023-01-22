@@ -1,41 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { Text, FlatList, Image, View, StyleSheet, Pressable } from "react-native";
+import {
+  Text,
+  FlatList,
+  Image,
+  View,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
-import { collection, getDocs } from "firebase/firestore"; 
+import { collection, doc, getDocs } from "firebase/firestore";
 import db from "../../firebase/config";
 
+const DefaultPostsScreen = ({ route, navigation }) => {
+  const { username, email, avatar } = useSelector((state) => state.auth);
+  const [posts, setPosts] = useState([]);
 
-const DefaultPostsScreen = ({ navigation }) => {
-const {username, email, avatar } = useSelector((state) => state.auth)
-const [posts, setPosts] = useState([]);
-
-const getAllPosts = async () => {
-const querySnapshot = await getDocs(collection(db, "posts"));
-await querySnapshot.forEach((doc) => {
-  setPosts(doc.id)
-  console.log(doc.id, " => ", doc.data());
-  console.log(posts)
-});
-await console.log(posts)
-
-  }
-
-  
   useEffect(() => {
-   getAllPosts()
-       }, []);
+    getAllPosts();
+  }, []);
+
+  const getAllPosts = async () => {
+    const querySnapshot = await getDocs(collection(db, "posts"));
+    let posts = [];
+    querySnapshot.forEach((doc) => {
+      setPosts((prevState) => [...prevState, {...doc.data(), id: doc.id}]);
+    });
+  };
 
   return (
     <View style={styles.posts}>
       <View style={styles.profile}>
-        {avatar && (
-          <Image
-            source={{uri: avatar}}
-            style={styles.avatar}
-          />
-        )}
+        {avatar && <Image source={{ uri: avatar }} style={styles.avatar} />}
         <View style={styles.text}>
           <Text style={styles.name}>{username}</Text>
           <Text style={styles.mail}>{email}</Text>
@@ -65,7 +62,7 @@ await console.log(posts)
                 marginBottom: 8,
               }}
             >
-              {name}
+              {item.name}
             </Text>
             <View
               style={{
@@ -75,7 +72,9 @@ await console.log(posts)
                 marginBottom: 8,
               }}
             >
-              <Pressable onPress={() => navigation.navigate("Коментарии", {item})}>
+              <Pressable
+                onPress={() => navigation.navigate("Коментарии", { postId: item.id, username })}
+              >
                 <Text
                   style={{
                     color: "#BDBDBD",
@@ -92,13 +91,15 @@ await console.log(posts)
                 </Text>
               </Pressable>
               <View style={{ flexDirection: "row" }}>
-              <Pressable onPress={() => navigation.navigate('Карта', {item})}>
-                <EvilIcons
-                  name="location"
-                  style={{ marginRight: 5, color: "#BDBDBD" }}
-                  size={24}
-                />
-              </Pressable>
+                <Pressable
+                  onPress={() => navigation.navigate("Карта", { item })}
+                >
+                  <EvilIcons
+                    name="location"
+                    style={{ marginRight: 5, color: "#BDBDBD" }}
+                    size={24}
+                  />
+                </Pressable>
 
                 <Text
                   style={{
@@ -108,7 +109,9 @@ await console.log(posts)
                     fontSize: 16,
                   }}
                 >
-                  {item.geocode.city ? `${item.geocode.city}, ${item.geocode.country}` : geocode}
+                  {item.geocode.city
+                    ? `${item.geocode.city}, ${item.geocode.country}`
+                    : item.geocode}
                 </Text>
               </View>
             </View>

@@ -18,6 +18,8 @@ import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch } from "react-redux";
 import { authSignUpUser } from "../../redux/auth/authOperation";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 
 const initialState = {
   email: "",
@@ -43,11 +45,24 @@ export default function RegistrationScreen({ navigation }) {
   const mailHandler = (text) => setEmail(text);
   const passwordHandler = (text) => setPassword(text);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsShowKeybord(false);
     Keyboard.dismiss();
     console.log(email, password, username, avatar)
-    dispatch(authSignUpUser(email, password, username, avatar));
+    const photo = await uploadPhotoToServer(avatar)
+    dispatch(authSignUpUser(email, password, username, photo));
+  };
+
+  const uploadPhotoToServer = async (avatar) => {
+    const response = await fetch(avatar);
+    const file = await response.blob();
+    const uniquePostId = Date.now().toString();
+    const storage = await getStorage();
+    const data = await ref(storage, `avatarImages/${uniquePostId}`);
+    await uploadBytes(data, file);
+    const processedPhoto = await getDownloadURL(data);
+    console.log(processedPhoto)
+    return processedPhoto;
   };
 
   const pickImage = async () => {

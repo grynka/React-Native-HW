@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AntDesign} from "@expo/vector-icons";
 import {
   View,
@@ -7,58 +7,75 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
+  FlatList,
+  KeyboardAvoidingView,
+  SafeAreaView
 } from "react-native";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import db from "../../firebase/config";
+import { useSelector } from "react-redux";
 
-const COMENTARS = [
-  {
-    author: "aurora",
-    avatar: require("../../assets/images/avatar.jpg"),
-    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
-  },
-  {
-    author: "vika",
-    avatar: require("../../assets/images/avatar.jpg"),
-    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
-  },
-  {
-    author: "lilia",
-    avatar: require("../../assets/images/avatar.jpg"),
-    text: "Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1 Комент 1",
-  },
-];
 
-const CommentsScreen = () => {
+const CommentsScreen = ({route}) => {
+  const { postId } = route.params;
   const [coment, setComent] = useState('');
-  const [comentars, setComentars] = useState(COMENTARS);
+  const [comentars, setComentars] = useState([]);
+  const { avatar, username } = useSelector((state) => state.auth);
+
+const sentComment = async () => {
+  const current = new Date();
+ // console.log(current)
+ const month = current.toLocaleString('default', { month: 'long' })+1
+  const date = `${current.getDate()} ${current.getMounth,+1} ${month} | ${current.getHours()}:${current.getMinutes()}`;
+
+  console.log(date)
+  try {
+    const docRef = await addDoc(collection(db, "posts", postId, "comments"), {
+      coment, username, avatar, date 
+    });
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+  setComent('')
+}
+
+const getAllComments = async () => {
+  const querySnapshot = await getDocs(collection(db, "posts", postId, "comments"));
+  querySnapshot.forEach((doc) => {
+    setComentars((prevState) => [...prevState, {...doc.data(), id: doc.id}]);
+  });
+}
+
+useEffect(() => {
+  getAllComments();
+}, [])
 
 const comentHandler = (text) => setComent(text);
-const addComent = () => {
-  setComentars((prevState) => [
-    ...prevState,
-    {
-     text: coment,
-     author: "vika",
-     avatar: require("../../assets/images/avatar.jpg"),
-    },]);
-    setComent('')
-};
+
 
   return (
     <View style={{flex: 1, backgroundColor: "#FFFFFF", paddingHorizontal: 16 }}>
-      <ScrollView>
-        {comentars.map((comentar) => (
-          <View key={comentar.index} style={comentar.index % 2 === 0 ? styles.comentar : styles.comentar2}>
-          <Image source={comentar.avatar}   style={styles.avatar}/>
-          <Text  style={styles.text}>{comentar.text}</Text></View>
-        ))}
-      </ScrollView>
+      <SafeAreaView>
+      <FlatList
+      data={comentars}        
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => <View key={item.id} style={item.index % 2 === 0 ? styles.comentar : styles.comentar2}>
+          <Image source={{uri: item.avatar}}   style={styles.avatar}/>
+          <Text  style={styles.text}>{item.coment}</Text>
+          <Text  style={styles.date}>{item.date}</Text>
+
+          </View>}
+          />
+      <KeyboardAvoidingView
+            behavior={Platform.OS == "ios" ? "padding" : "height"}
+          >
       <View style={styles.input}>
         <TextInput onChangeText={comentHandler} placeholder="Комментировать" style={styles.field} value={coment}/>
-        <TouchableOpacity style={styles.btn} onPress={addComent}>
+        <TouchableOpacity style={styles.btn} onPress={sentComment}>
           <AntDesign name="arrowup" size={20} color="white" />
         </TouchableOpacity>
-      </View>
+      </View></KeyboardAvoidingView></SafeAreaView>
     </View>
   );
 };

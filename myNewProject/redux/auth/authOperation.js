@@ -24,7 +24,7 @@ export const authSignInUser = (email, password) => async (dispatch, getState) =>
 };
 
 export const authSignUpUser =
-  (email, password, username, avatar) => async () => {
+  (email, password, username, photo) => async () => {
     const auth = getAuth();
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -37,10 +37,10 @@ export const authSignUpUser =
         const errorMessage = error.message;
         // ..
       });
-    console.log(email, password, username, avatar),
+    console.log(email, password, username, photo),
       await updateProfile(auth.currentUser, {
         displayName: username,
-        photoURL: avatar,
+        photoURL: photo,
       });
   };
 

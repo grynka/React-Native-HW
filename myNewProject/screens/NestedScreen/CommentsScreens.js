@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, orderBy } from "firebase/firestore";
 import db from "../../firebase/config";
 import { useSelector } from "react-redux";
 
@@ -54,10 +54,11 @@ const CommentsScreen = ({ route }) => {
   };
 
   const getAllComments = async () => {
-    const querySnapshot = await getDocs(
-      collection(db, "posts", postId, "comments")
-    );
-    querySnapshot.forEach((doc) => {
+    const q = query(collection(db, "posts", postId, "comments"), orderBy("timestamp"))    
+    const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          console.log(doc.data());
+
       setComentars((prevState) => [
         ...prevState,
         { ...doc.data(), id: doc.id },

@@ -48,7 +48,6 @@ export default function RegistrationScreen({ navigation }) {
   const handleSubmit = async () => {
     setIsShowKeybord(false);
     Keyboard.dismiss();
-    console.log(email, password, username, avatar)
     const photo = await uploadPhotoToServer(avatar)
     dispatch(authSignUpUser(email, password, username, photo));
   };
@@ -61,7 +60,6 @@ export default function RegistrationScreen({ navigation }) {
     const data = await ref(storage, `avatarImages/${uniquePostId}`);
     await uploadBytes(data, file);
     const processedPhoto = await getDownloadURL(data);
-    console.log(processedPhoto)
     return processedPhoto;
   };
 

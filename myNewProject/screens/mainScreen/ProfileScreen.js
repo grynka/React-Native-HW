@@ -5,7 +5,7 @@ import {
   Text,
   Image,
   ImageBackground,
-  TouchableOpacity,
+  FlatList,
   StyleSheet,
   Pressable,
 } from "react-native";
@@ -13,18 +13,38 @@ import { useSelector, useDispatch } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
 import { authSignOutUser } from "../../redux/auth/authOperation";
+import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import db from "../../firebase/config";
+import { EvilIcons } from "@expo/vector-icons";
+import { Fontisto } from "@expo/vector-icons";
 
 const ProfileScreen = () => {
-  const { username, avatar } = useSelector((state) => state.auth);
-  const [avatarImg, setAvatarImg] = useState("");
+  const [ avatarImg, setAvatarImg] = useState("");
+  const { username, avatar, uid } = useSelector((state) => state.auth);
+  const [ posts, setPosts] = useState([]);
+  
   const dispatch = useDispatch();
+
   const SignOut = () => {
     dispatch(authSignOutUser());
   };
 
   useEffect(() => {
-    setAvatarImg(avatar);
+    setAvatarImg(avatar)
+    getUserPosts()
   }, []);
+
+
+  const getUserPosts = async () => {
+    setPosts([])
+    const q = query(collection(db, "posts"), where("uid", "==", uid));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data())
+      setPosts((prevState) => [...prevState, {...doc.data(), id: doc.id}]);
+    });
+  };
+
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -38,22 +58,9 @@ const ProfileScreen = () => {
       if (!result.canceled) {
       setAvatarImg(result.assets[0].uri);
     }
-
-    const getAllPosts = async () => {
-      const querySnapshot = await getDocs(collection(db, "posts"));
-      querySnapshot.forEach((doc) => 
-      setPosts({...doc.data(), id: doc.id}),
-      console.log(posts)
-      )
-        }
+     
+      }
       
-        
-        useEffect(() => {
-          getAllPosts()
-             }, []);
-  };
-
-
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -83,15 +90,94 @@ const ProfileScreen = () => {
               </Pressable>
             )}
           </View>
-          
-          <Text style={styles.name}>{username}</Text><Pressable style={styles.signout} onPress={SignOut}>
+          <Text style={styles.name}>{username}</Text>
+          <Pressable style={styles.signout} onPress={SignOut}>
             <Feather
               name="log-out"
               style={{ marginRight: 16, color: "#BDBDBD" }}
               size={24}
             />
-          </Pressable>
-        </View>
+          </Pressable>        
+          <FlatList
+        style={{ flex: 1, width: "100%" }}
+        data={posts}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={{ flex: 1 }}>
+            <Image
+              source={{ uri: item.photo }}
+              style={{
+                height: 240,
+                borderRadius: 8,
+                marginBottom: 8,
+                marginTop: 32,
+              }}
+            />
+            <Text
+              style={{
+                fontFamily: "Roboto-Regular",
+                fontSize: 16,
+                fontWeight: "500",
+                marginBottom: 8,
+              }}
+            >
+              {item.name}
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 8,
+              }}
+            >
+              <Pressable
+                onPress={() => navigation.navigate("Коментарии", { postId: item.id, image: item.photo })}
+              >
+                <Text
+                  style={{
+                    color: "#BDBDBD",
+                    fontFamily: "Roboto-Regular",
+                    fontSize: 16,
+                  }}
+                >
+                  <Fontisto
+                    name="comment"
+                    style={{ marginRight: 10 }}
+                    size={16}
+                  />{" "}
+                  0
+                </Text>
+              </Pressable>
+              <View style={{ flexDirection: "row" }}>
+                <Pressable
+                  onPress={() => navigation.navigate("Карта", { item })}
+                >
+                  <EvilIcons
+                    name="location"
+                    style={{ marginRight: 5, color: "#BDBDBD" }}
+                    size={24}
+                  />
+                </Pressable>
+
+                <Text
+                  style={{
+                    alignItems: "center",
+                    textDecorationLine: "underline",
+                    fontFamily: "Roboto-Regular",
+                    fontSize: 16,
+                  }}
+                >
+                  {item.geocode.city
+                    ? `${item.geocode.city}, ${item.geocode.country}`
+                    : item.geocode}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+      />
+      </View>
       </ImageBackground>
     </View>
   );
@@ -100,17 +186,24 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
   },
 
-  content: {
+    content: {
+    flex: 1,
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     fontFamily: "Roboto-Regular",
-    height: "100%",
+    paddingHorizontal: 16,
   },
+
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    paddingTop: 144
+  },
+
 
   avatar: {
     borderRadius: 8,
@@ -168,12 +261,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
 
-  image: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "flex-start",
-    paddingTop: 147,
-  },
 
   signout: {
     justifyContent: "center",

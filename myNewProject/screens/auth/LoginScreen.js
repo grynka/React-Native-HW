@@ -22,6 +22,7 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [isSecurity, setIsSecurity] = useState(true);
   const [isShowKeybord, setIsShowKeybord] = useState(false)
+  
   const keboardHide = () => {
     setIsShowKeybord(false);
     Keyboard.dismiss();
@@ -45,7 +46,7 @@ export default function LoginScreen({ navigation }) {
           source={require("../../assets/images/BG.jpg")}
         >
           <KeyboardAvoidingView  behavior={Platform.OS == "ios" ? "padding" : "height"}>
-            <View style={{...styles.form, paddingBottom: isShowKeybord ? 10 : 144}}>
+            <View style={{...styles.form, paddingBottom: isShowKeybord ? 20 : 144}}>
               <Text style={styles.title}>Войти</Text>
               <TextInput
                 value={email}

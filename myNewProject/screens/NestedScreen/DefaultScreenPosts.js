@@ -9,21 +9,22 @@ import {
 } from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { collection, doc, getDocs } from "firebase/firestore";
 import db from "../../firebase/config";
 
 const DefaultPostsScreen = ({ route, navigation }) => {
   const { username, email, avatar } = useSelector((state) => state.auth);
   const [posts, setPosts] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    setPosts([])
     getAllPosts();
   }, []);
 
   const getAllPosts = async () => {
-    const querySnapshot = await getDocs(collection(db, "posts"));
-    let posts = [];
+    const querySnapshot = await getDocs(collection(db, `posts`));
     querySnapshot.forEach((doc) => {
       setPosts((prevState) => [...prevState, {...doc.data(), id: doc.id}]);
     });
@@ -73,7 +74,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
               }}
             >
               <Pressable
-                onPress={() => navigation.navigate("Коментарии", { postId: item.id, username })}
+                onPress={() => navigation.navigate("Коментарии", { postId: item.id, image: item.photo })}
               >
                 <Text
                   style={{

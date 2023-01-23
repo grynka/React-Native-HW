@@ -4,8 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AntDesign } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native-gesture-handler";
+
 
 const AuthStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();

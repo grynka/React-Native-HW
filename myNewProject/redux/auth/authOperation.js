@@ -11,11 +11,9 @@ import { authSlice } from "./authReducer";
 
 export const authSignInUser = (email, password) => async (dispatch, getState) => {
   const auth = getAuth();
-  signInWithEmailAndPassword(auth, email, password)
+  signInWithEmailAndPassword(getAuth(), email, password)
     .then((userCredential) => {
-      // Signed in
-      dispatch(authSlice.actions.updateUserProfile({uid: userCredential.user.uid, displayName: userCredential.user.displayName, email: userCredential.user.email, avatar: userCredential.user.photoURL}))
-      console.log(user);
+      console.log(userCredential)
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -24,42 +22,20 @@ export const authSignInUser = (email, password) => async (dispatch, getState) =>
 };
 
 export const authSignUpUser =
-  (email, password, username, photo) => async () => {
-    const auth = getAuth();
-    await createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        // ...
-      })
-      .catch((error) => {
+  (email, password, username, photo) => async (dispatch) => {
+    const { user } = await createUserWithEmailAndPassword(getAuth(), email, password)
+        .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         // ..
       });
-    console.log(email, password, username, photo),
-      await updateProfile(auth.currentUser, {
+      await updateProfile(user, {
         displayName: username,
         photoURL: photo,
-      });
-  };
-
-export const writeDataToFirestore =
-  (image, geocode, name, location) => async () => {
-    try {
-      const docRef = await addDoc(collection(db, "posts"), {
-        posts: {
-          uri: image,
-          id: image,
-          geocode: geocode,
-          name: name,
-          location: location,
-        },
-      });
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
+      }).then(
+        dispatch(authSlice.actions.authStateChange({stateChange: true})),
+        dispatch(authSlice.actions.updateUserProfile({uid: user.uid, displayName: username, email: user.email, avatar: photo})),
+       );
   };
 
 export const authSignOutUser = () => async (dispatch, getState) => {
@@ -76,7 +52,6 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
   const auth = getAuth();
   await auth.onAuthStateChanged((user) => {
     if(user){
-      console.log("пользователь", user);
       dispatch(authSlice.actions.updateUserProfile({uid: user.uid, displayName: user.displayName, email: user.email, avatar: user.photoURL}));
       dispatch(authSlice.actions.authStateChange({stateChange: true}))
     }

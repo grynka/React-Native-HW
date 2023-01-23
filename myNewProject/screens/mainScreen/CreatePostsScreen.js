@@ -9,6 +9,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
+  Button
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { FontAwesome } from "@expo/vector-icons";

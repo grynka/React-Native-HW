@@ -41,6 +41,7 @@ const CommentsScreen = ({ route }) => {
         username,
         avatar,
         date,
+        timestamp: uniquePostId
       });
       console.log("Comment written with ID: ", docRef.id);
     } catch (e) {

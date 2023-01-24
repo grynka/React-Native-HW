@@ -15,18 +15,16 @@ import {
 import { authSignInUser } from "../../redux/auth/authOperation";
 import { useDispatch } from "react-redux";
 
-
-
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSecurity, setIsSecurity] = useState(true);
-  const [isShowKeybord, setIsShowKeybord] = useState(false)
-  
+  const [isShowKeybord, setIsShowKeybord] = useState(false);
+
   const keboardHide = () => {
     setIsShowKeybord(false);
     Keyboard.dismiss();
-  }
+  };
   const dispatch = useDispatch();
 
   const emailHandler = (text) => setEmail(text);
@@ -40,39 +38,41 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <TouchableWithoutFeedback onPress={keboardHide}>
-      <View style={styles.container}>
-        <ImageBackground
-          style={styles.image}
-          source={require("../../assets/images/BG.jpg")}
-        >
-          <KeyboardAvoidingView  behavior={Platform.OS == "ios" ? "padding" : "height"}>
-            <View style={{...styles.form, paddingBottom: isShowKeybord ? 20 : 144}}>
-              <Text style={styles.title}>Войти</Text>
+    <ImageBackground
+      style={styles.image}
+      source={require("../../assets/images/BG.jpg")}
+    >
+      <TouchableWithoutFeedback onPress={keboardHide}>
+        <View style={styles.container}>
+          <View style={styles.form}>
+            <Text style={styles.title}>Войти</Text>
+            <TextInput
+              value={email}
+              onChangeText={emailHandler}
+              placeholder="Адрес электронной почты"
+              style={styles.inputName}
+              onFocus={() => setIsShowKeybord(true)}
+            />
+            <View style={styles.inputContainer}>
               <TextInput
-                value={email}
-                onChangeText={emailHandler}
-                placeholder="Адрес электронной почты"
-                style={styles.inputName}
+                value={password}
+                onChangeText={passwordHandler}
+                placeholder="Пароль"
+                secureTextEntry={isSecurity}
+                style={styles.input}
                 onFocus={() => setIsShowKeybord(true)}
               />
-              <View style={styles.inputContainer}>
-                <TextInput
-                  value={password}
-                  onChangeText={passwordHandler}
-                  placeholder="Пароль"
-                  secureTextEntry={isSecurity}
-                  style={styles.input}
-                  onFocus={() => setIsShowKeybord(true)}
-                />
-                <Pressable
-                  onPress={() => {
-                    setIsSecurity((prev) => !prev);
-                  }}
-                >
-                  <Text style={styles.showPass}>{isSecurity ? "Показать" : "Скрыть"}</Text>
-                </Pressable>
-              </View>
-              <View style={{display: isShowKeybord ? 'none' : 'flex'}}>
+              <Pressable
+                onPress={() => {
+                  setIsSecurity((prev) => !prev);
+                }}
+              >
+                <Text style={styles.showPass}>
+                  {isSecurity ? "Показать" : "Скрыть"}
+                </Text>
+              </Pressable>
+            </View>
+            <View style={{ display: isShowKeybord ? "none" : "flex" }}>
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.loginButton}
@@ -81,16 +81,16 @@ export default function LoginScreen({ navigation }) {
                 <Text style={styles.loginButtonText}>Войти</Text>
               </TouchableOpacity>
               <View style={styles.containerNoRegister}>
-              <Text style={styles.noRegister}>
-                Нет акаунта? </Text>
-                <Pressable 
-        onPress={() => navigation.navigate("Registration")}
-      ><Text style={styles.noRegister}> Зарегистрироваться</Text></Pressable>
-              </View></View>
+                <Text style={styles.noRegister}>Нет акаунта? </Text>
+                <Pressable onPress={() => navigation.navigate("Registration")}>
+                  <Text style={styles.noRegister}> Зарегистрироваться</Text>
+                </Pressable>
+              </View>
             </View>
-          </KeyboardAvoidingView>
-        </ImageBackground>
-      </View>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </ImageBackground>
     </TouchableWithoutFeedback>
   );
 }
@@ -98,32 +98,46 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#fff",
+    paddingHorizontal: 16,
+    borderTopStartRadius: 25,
+    borderTopEndRadius: 25,
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    paddingTop: 340,
+  },
+  title: {
+    fontSize: 30,
+    alignSelf: "center",
+    paddingVertical: 32,
+    fontFamily: "Roboto-Medium",
+  },
+
+  form: {
+    alignSelf: "stretch",
+  },
+
+  inputName: {
+    borderRadius: 8,
+    borderWidth: 1,
+    padding: 16,
+    height: 50,
+    borderColor: "#E8E8E8",
+    marginBottom: 16,
+    color: "#BDBDBD",
+    backgroundColor: "#F6F6F6",
+    fontFamily: "Roboto-Medium",
   },
 
   inputContainer: {
     backgroundColor: "#F6F6F6",
-    marginHorizontal: 16,
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#E8E8E8",
-  },
-
-  image: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "flex-end",
-  },
-
-  form: {
-    backgroundColor: "#FFFFFF",
-    paddingTop: 32,
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    fontFamily: "Roboto-Regular",
-    paddingBottom: 144,
   },
 
   input: {
@@ -133,27 +147,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#F6F6F6",
     color: "#212121",
+    fontFamily: "Roboto-Medium",
     fontSize: 16,
     width: "80%",
   },
 
   showPass: {
-    color: '#1B4371',
+    color: "#1B4371",
     fontSize: 16,
     fontFamily: "Roboto-Regular",
-  },
-
-  inputName: {
-    height: 50,
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: "#F6F6F6",
-    color: "#212121",
-    fontSize: 16,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#E8E8E8",
   },
 
   loginButton: {
@@ -172,12 +174,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "400",
-  },
-
-  title: {
-    fontSize: 30,
-    textAlign: "center",
-    marginBottom: 32,
     fontFamily: "Roboto-Medium",
   },
 
@@ -187,6 +183,7 @@ const styles = StyleSheet.create({
     color: "#1B4371",
     fontSize: 16,
   },
+
   containerNoRegister: {
     flexDirection: "row",
     justifyContent: "center",

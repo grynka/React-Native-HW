@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Text,
   FlatList,
@@ -9,24 +9,43 @@ import {
 } from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
-import { useDispatch, useSelector } from "react-redux";
-import { collection, doc, getDocs } from "firebase/firestore";
+import { Feather } from '@expo/vector-icons';
+import { useSelector } from "react-redux";
+import { collection, getDocs, query, getCountFromServer, addDoc, updateDoc, doc } from "firebase/firestore";
 import db from "../../firebase/config";
+import { useFocusEffect } from "@react-navigation/native";
 
-const DefaultPostsScreen = ({ route, navigation }) => {
+const DefaultPostsScreen = ({ navigation }) => {
   const { username, email, avatar } = useSelector((state) => state.auth);
   const [posts, setPosts] = useState([]);
-  const dispatch = useDispatch();
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      setPosts([]);
+      getAllPosts();
+    }, [])
+  );
 
-  useEffect(() => {
-    setPosts([])
+  const sentLike= async (prev, id) => {
+    try {
+      const docRef = await updateDoc(doc(db, `posts/${id}`), {
+       like: !prev ? 1 : prev+1
+      });
+      console.log("Like written with ID: ", id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+    setPosts([]);
     getAllPosts();
-  }, []);
+  };
 
-  const getAllPosts = async () => {
+    const getAllPosts = async () => {
     const querySnapshot = await getDocs(collection(db, `posts`));
-    querySnapshot.forEach((doc) => {
-      setPosts((prevState) => [...prevState, {...doc.data(), id: doc.id}]);
+    querySnapshot.forEach( async (doc) => {
+      const q = query(collection(db, "posts", doc.id, "comments"))    
+      const querySnapshot = await getCountFromServer(q);
+      const comments = await querySnapshot.data().count
+      setPosts((prevState) => [...prevState, {...doc.data(), id: doc.id, count: comments}]);
     });
   };
 
@@ -72,25 +91,49 @@ const DefaultPostsScreen = ({ route, navigation }) => {
                 justifyContent: "space-between",
                 marginBottom: 8,
               }}
-            >
+            ><View style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}>
               <Pressable
                 onPress={() => navigation.navigate("Коментарии", { postId: item.id, image: item.photo })}
               >
                 <Text
                   style={{
-                    color: "#BDBDBD",
+                    color: item.count>0 ? "#000000" : "#BDBDBD",
                     fontFamily: "Roboto-Regular",
                     fontSize: 16,
+                    alignSelf: "center",
+                    marginRight: 24,
                   }}
                 >
-                  <Fontisto
-                    name="comment"
-                    style={{ marginRight: 10 }}
-                    size={16}
+                <Feather name="message-circle" 
+                    style={{ marginRight: 10, color: item.count>0 ? "#FF6C00" : "#BDBDBD"}}
+                    size={20}
                   />{" "}
-                  0
+                  { item.count }
                 </Text>
               </Pressable>
+              <Pressable
+                onPress={() => sentLike(item.like, item.id)}
+              >
+                <Text
+                  style={{
+                    color: item.like>0 ? "#000000" : "#BDBDBD",
+                    fontFamily: "Roboto-Regular",
+                    fontSize: 16,
+                    alignSelf: "center",
+                  }}
+                >
+                <Feather name="thumbs-up" 
+                    style={{ marginRight: 10, marginLeft: 20, color: item.like>0 ? "#FF6C00" : "#BDBDBD"}}
+                    size={20}
+                  />{" "}
+                  { !item.like ? 0 : item.like}
+                </Text>
+              </Pressable>
+              </View>
               <View style={{ flexDirection: "row" }}>
                 <Pressable
                   onPress={() => navigation.navigate("Карта", { item })}

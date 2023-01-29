@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { useRoute } from "../router";
 import { useDispatch, useSelector } from "react-redux";

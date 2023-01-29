@@ -122,8 +122,10 @@ export default function CreateScreen({ navigation }) {
   
   const sendFoto = () => {
     uploadPostsToServer();
-    navigation.navigate("PostsScreen");
-    
+    navigation.navigate("PostsScreen", {reload: "reload"});
+    setImage('')
+    setName('')
+    setLocation('')
   };
 
   const pickImage = async () => {
